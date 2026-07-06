@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MOKET | 紐⑤컮???곹뭹 愿由ъ옄</title>
+    <title>MOKET | 모바일 상품 관리자</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -44,7 +44,7 @@
             padding-bottom: 30px;
         }
 
-        /* ?ㅻ뜑 ?ㅽ???*/
+        /* 헤더 스타일 */
         header {
             background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
             color: white;
@@ -74,7 +74,7 @@
             margin-top: 4px;
         }
 
-        /* 而⑦뀒?대꼫 */
+        /* 컨테이너 */
         .container {
             width: 100%;
             max-width: 480px;
@@ -83,7 +83,7 @@
             flex: 1;
         }
 
-        /* ??媛?대뱶 */
+        /* 탭 가이드 */
         .tabs {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -111,7 +111,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        /* ?뱀뀡 而⑦뀗痢?*/
+        /* 섹션 컨텐츠 */
         .tab-content {
             display: none;
         }
@@ -126,7 +126,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 移대뱶 而⑦뀒?대꼫 */
+        /* 카드 컨테이너 */
         .card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -147,7 +147,7 @@
             padding-left: 8px;
         }
 
-        /* ???붿냼 ?ㅽ???*/
+        /* 폼 요소 스타일 */
         .form-group {
             margin-bottom: 16px;
         }
@@ -183,7 +183,7 @@
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
-        /* ??踰꾪듉 洹몃９ (?遺꾨쪟) */
+        /* 탭 버튼 그룹 (대분류) */
         .segment-control {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -198,7 +198,7 @@
             grid-template-columns: repeat(5, 1fr);
         }
 
-        /* ?섏쐞 ???ㅽ???*/
+        /* 하위 탭 스타일 */
         .sub-tabs-container {
             display: flex;
             gap: 6px;
@@ -253,7 +253,7 @@
             box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
         }
 
-        /* 媛寃???踰꾪듉 洹몃９ */
+        /* 가격 퀵 버튼 그룹 */
         .quick-price-group {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -278,7 +278,7 @@
             color: var(--text-main);
         }
 
-        /* ?ш퀬 ?좉? 洹몃９ */
+        /* 재고 토글 그룹 */
         .stock-row {
             display: flex;
             align-items: center;
@@ -292,7 +292,7 @@
             cursor: pointer;
         }
 
-        /* ?ъ쭊 ?꾨━酉?諛뺤뒪 */
+        /* 사진 프리뷰 박스 */
         .image-upload-box {
             border: 2px dashed var(--border);
             border-radius: var(--radius-sm);
@@ -324,7 +324,7 @@
             margin-bottom: 6px;
         }
 
-        /* 踰꾪듉 */
+        /* 버튼 */
         .btn-submit {
             width: 100%;
             background: var(--primary);
@@ -368,7 +368,7 @@
             display: none;
         }
 
-        /* ?곹뭹 紐⑸줉 移대뱶 */
+        /* 상품 목록 카드 */
         .product-item {
             display: flex;
             gap: 12px;
@@ -456,7 +456,7 @@
             color: var(--danger);
         }
 
-        /* 濡쒕뜑 ?ㅻ쾭?덉씠 */
+        /* 로더 오버레이 */
         .loader-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -489,7 +489,7 @@
             letter-spacing: -0.2px;
         }
 
-        /* ?좎뒪??*/
+        /* 토스트 */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -518,137 +518,140 @@
 <body>
 
     <header>
-        <h1>?벀 MOKET ?곹뭹 ?낅줈??/h1>
-        <p>二쇰Ц???깆뿉 ?ㅼ뼱媛??곹뭹???ㅻ쭏?명룿?쇰줈 鍮좊Ⅴ寃??깅줉?섏꽭??</p>
+        <h1>📦 MOKET 상품 업로더</h1>
+        <p>주문서 앱에 들어갈 상품을 스마트폰으로 빠르게 등록하세요.</p>
     </header>
 
     <div class="container">
-        <!-- ??援ъ“ -->
+        <!-- 탭 구조 -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('upload')">?랃툘 ?곹뭹 ?깅줉</button>
-            <button class="tab-btn" onclick="switchTab('manage')">?뱥 ?곹뭹 紐⑸줉 (<span id="product-count">0</span>)</button>
+            <button class="tab-btn active" onclick="switchTab('upload')">✍️ 상품 등록</button>
+            <button class="tab-btn" onclick="switchTab('manage')">📋 상품 목록 (<span id="product-count">0</span>)</button>
         </div>
 
-        <!-- ??1: ?곹뭹 ?깅줉 -->
+        <!-- 탭 1: 상품 등록 -->
         <div id="tab-upload" class="tab-content active">
             <div class="card">
-                <div class="card-title" id="form-card-title">???좉퇋 ?곹뭹 ?깅줉</div>
+                <div class="card-title" id="form-card-title">✨ 신규 상품 등록</div>
                 
                 <form id="productForm" onsubmit="submitForm(event)">
-                    <!-- ?遺꾨쪟 ?멸렇癒쇳듃 -->
+                    <!-- 대분류 세그먼트 -->
                     <div class="form-group">
-                        <label>?遺꾨쪟 ??/label>
+                        <label>대분류 탭</label>
                         <div class="segment-control">
-                            <div class="segment-btn active" data-tab="fruit" onclick="selectMainTab('fruit')">怨쇱씪/?쇱콈</div>
-                            <div class="segment-btn" data-tab="reserve" onclick="selectMainTab('reserve')">怨듬룞援щℓ</div>
-                            <div class="segment-btn" data-tab="onsite" onclick="selectMainTab('onsite')">?곸떆?먮ℓ</div>
-                            <div class="segment-btn" data-tab="costco" onclick="selectMainTab('costco')">肄붿뒪?몄퐫</div>
+                            <div class="segment-btn active" data-tab="fruit" onclick="selectMainTab('fruit')">과일/야채</div>
+                            <div class="segment-btn" data-tab="reserve" onclick="selectMainTab('reserve')">공동구매</div>
+                            <div class="segment-btn" data-tab="onsite" onclick="selectMainTab('onsite')">상시판매</div>
+                            <div class="segment-btn" data-tab="costco" onclick="selectMainTab('costco')">코스트코</div>
                         </div>
                     </div>
 
-                    <!-- ?곸꽭 遺꾨쪟 (?遺꾨쪟???곕씪 ?숈쟻?쇰줈 援ъ꽦?? -->
+                    <!-- 상세 분류 (대분류에 따라 동적으로 구성됨) -->
                     <div class="form-group" id="categoryGroup">
-                        <label id="categoryLabel">移댄뀒怨좊━ / ?좎쭨</label>
-                        <!-- ?숈쟻?쇰줈 input ?먮뒗 select ?쒓렇媛 ?꾩튂??-->
+                        <label id="categoryLabel">카테고리 / 날짜</label>
+                        <!-- 동적으로 input 또는 select 태그가 위치함 -->
                         <div id="categoryContainer"></div>
                     </div>
 
-                    <!-- ?곹뭹紐?-->
+                    <!-- 상품명 -->
                     <div class="form-group">
-                        <label>?곹뭹紐?/label>
-                        <input type="text" id="productName" class="form-control" placeholder="?? 臾대냽???꾨━誘몄뾼 ?멸린 1kg" required>
+                        <label>상품명</label>
+                        <input type="text" id="productName" class="form-control" placeholder="예: 무농약 프리미엄 딸기 1kg" required>
                     </div>
 
-                    <!-- 媛寃?-->
+                    <!-- 가격 -->
                     <div class="form-group">
-                        <label>媛寃?(??</label>
-                        <input type="number" id="productPrice" class="form-control" placeholder="?? 15000" min="0" required>
+                        <label>가격 (원)</label>
+                        <input type="number" id="productPrice" class="form-control" placeholder="예: 15000" min="0" required>
                     </div>
 
-                    <!-- ?ш퀬 ?섎웾 -->
+                    <!-- 재고 수량 -->
                     <div class="form-group">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <label style="margin-bottom: 0;">二쇰Ц 媛???ш퀬??/label>
+                            <label style="margin-bottom: 0;">주문 가능 재고량</label>
                             <div class="switch-container" onclick="toggleUnlimitedStock()">
                                 <input type="checkbox" id="unlimitedStock" style="cursor: pointer;">
-                                <span style="font-size: 12px; font-weight: 700; color: var(--text-sub);">臾댁젣??/span>
+                                <span style="font-size: 12px; font-weight: 700; color: var(--text-sub);">무제한</span>
                             </div>
                         </div>
-                        <input type="number" id="productStock" class="form-control" placeholder="?? 50" min="0" required>
+                        <input type="number" id="productStock" class="form-control" placeholder="예: 50" min="0" required>
                     </div>
 
-                    <!-- ?곸꽭 ?ㅻ챸 -->
+                    <!-- 상세 설명 -->
                     <div class="form-group">
-                        <label>?곸꽭?ㅻ챸</label>
-                        <textarea id="productDesc" rows="3" placeholder="?곹뭹?????留? ?ш린, ?먯궛吏 ?깆쓽 ?곸꽭 ?ㅻ챸???낅젰?섏꽭??.." oninput="autoResizeTextarea(this)"></textarea>
+                        <label>상세설명</label>
+                        <textarea id="productDesc" rows="3" placeholder="상품에 대한 맛, 크기, 원산지 등의 상세 설명을 입력하세요..." oninput="autoResizeTextarea(this)"></textarea>
                     </div>
 
-                    <!-- ?대?吏 泥⑤? -->
+                    <!-- 이미지 첨부 -->
                     <div class="form-group">
-                        <label>?곹뭹 ?대?吏</label>
+                        <label>상품 이미지</label>
                         <div class="image-upload-box" onclick="triggerFileInput()">
-                            <div class="upload-icon">?벝</div>
-                            <div style="font-size: 13px; font-weight: 600; color: var(--text-sub);">?ъ쭊 珥ъ쁺 ?먮뒗 ?뚯씪 ?좏깮 (?щ윭 ??媛??</div>
+                            <div class="upload-icon">📸</div>
+                            <div style="font-size: 13px; font-weight: 600; color: var(--text-sub);">사진 촬영 또는 파일 선택 (여러 장 가능)</div>
                             <input type="file" id="imageFile" accept="image/*" multiple style="display: none;" onchange="handleFileSelection(event)">
                         </div>
-                        <!-- ?좏깮???뚯씪 紐⑸줉 諛???쒖씠誘몄? 吏???곸뿭 -->
+                        <!-- 선택된 파일 목록 및 대표이미지 지정 영역 -->
                         <div id="imageListContainer" style="margin-top: 12px; display: none;">
-                            <label style="font-size: 12px; color: var(--text-sub); font-weight: bold; margin-bottom: 6px; display: block;">?좏깮???ъ쭊 ?뚯씪 (????щ꽕???좏깮):</label>
+                            <label style="font-size: 12px; color: var(--text-sub); font-weight: bold; margin-bottom: 6px; display: block;">선택된 사진 파일 (대표 섬네일 선택):</label>
                             <div id="selectedFilesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit" id="submitBtn">?? ?곹뭹 ?깅줉 ?꾨즺</button>
-                    <button type="button" class="btn-cancel" id="cancelBtn" onclick="exitEditMode()">?섏젙 痍⑥냼</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">🚀 상품 등록 완료</button>
+                    <button type="button" class="btn-cancel" id="cancelBtn" onclick="exitEditMode()">수정 취소</button>
                 </form>
             </div>
         </div>
 
-        <!-- ??2: ?곹뭹 紐⑸줉 愿由?-->
+        <!-- 탭 2: 상품 목록 관리 -->
         <div id="tab-manage" class="tab-content">
-            <!-- ?곹뭹 紐⑸줉 ?遺꾨쪟 ?꾪꽣 ??-->
+            <!-- 상품 목록 대분류 필터 탭 -->
             <div class="segment-control five-cols" style="margin-bottom: 12px;">
-                <div class="segment-btn active" data-manage-tab="all" onclick="selectManageTab('all')">?꾩껜</div>
-                <div class="segment-btn" data-manage-tab="fruit" onclick="selectManageTab('fruit')">怨쇱씪/?쇱콈</div>
-                <div class="segment-btn" data-manage-tab="reserve" onclick="selectManageTab('reserve')">怨듬룞援щℓ</div>
-                <div class="segment-btn" data-manage-tab="onsite" onclick="selectManageTab('onsite')">?곸떆?먮ℓ</div>
-                <div class="segment-btn" data-manage-tab="costco" onclick="selectManageTab('costco')">肄붿뒪?몄퐫</div>
+                <div class="segment-btn active" data-manage-tab="all" onclick="selectManageTab('all')">전체</div>
+                <div class="segment-btn" data-manage-tab="fruit" onclick="selectManageTab('fruit')">과일/야채</div>
+                <div class="segment-btn" data-manage-tab="reserve" onclick="selectManageTab('reserve')">공동구매</div>
+                <div class="segment-btn" data-manage-tab="onsite" onclick="selectManageTab('onsite')">상시판매</div>
+                <div class="segment-btn" data-manage-tab="costco" onclick="selectManageTab('costco')">코스트코</div>
             </div>
-            <!-- ?곹뭹 紐⑸줉 ?뚮텇瑜??섏쐞 ??-->
+            <!-- 상품 목록 소분류 하위 탭 -->
             <div id="sub-products-list-tabs" class="sub-tabs-container" style="display: none; margin-bottom: 12px;"></div>
             <div class="card" style="padding: 10px;">
                 <div id="products-list-container">
-                    <!-- ?곹뭹 紐⑸줉??鍮꾩뼱?덉쓣 ???꾩떆 ?곹깭 -->
+                    <!-- 상품 목록이 비어있을 때 임시 상태 -->
                     <div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">
-                        ?곹뭹 紐⑸줉??遺덈윭?ㅻ뒗 以묒엯?덈떎...
+                        상품 목록을 불러오는 중입니다...
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 濡쒕뜑 ?ㅻ쾭?덉씠 -->
+    <!-- 로더 오버레이 -->
     <div class="loader-overlay" id="loader">
         <div class="spinner"></div>
-        <div class="loader-text" id="loader-text">泥섎━ 以묒엯?덈떎...</div>
+        <div class="loader-text" id="loader-text">처리 중입니다...</div>
     </div>
 
-    <!-- ?좎뒪??硫붿떆吏 -->
+    <!-- 토스트 메시지 -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ?곸닔 ?뺤쓽
+        // 상수 정의
         const FIREBASE_DB_URL = "https://moketdb-default-rtdb.asia-southeast1.firebasedatabase.app/";
         const API_URL = "https://script.google.com/macros/s/AKfycbw6F-D5UhJTkLafBv4uOs5_lUD61ervXveLCcZ6ROHNYhFbEi_vJUamKHUjHE9wGeaY/exec";
 
-        // ?곹깭 蹂??        let currentTab = "reserve"; // reserve, onsite, fruit, costco
+        // 상태 변수
+        let currentTab = "reserve"; // reserve, onsite, fruit, costco
         let products = [];
         let isEditMode = false;
-        let editProductKey = null; // ?섏젙 ???ъ슜???곹뭹 ?몃뜳???앸퀎??        let selectedDate = new Date().toISOString().split('T')[0];
+        let editProductKey = null; // 수정 시 사용할 상품 인덱스/식별자
+        let selectedDate = new Date().toISOString().split('T')[0];
         let currentManageTab = "all"; // all, fruit, reserve, onsite, costco
-        let currentSubTab = "all"; // all, YYYY-MM-DD (怨듬룞援щℓ ?좎쭨), ?됰룞/?됱옣/?곸삩 (?곸떆?먮ℓ)
+        let currentSubTab = "all"; // all, YYYY-MM-DD (공동구매 날짜), 냉동/냉장/상온 (상시판매)
         
-        // ?ㅼ쨷 ?뚯씪 諛??щ꽕???곹깭 蹂??        let selectedFiles = []; // { file: File, id: null, isExisting: false, displayName: '...' }
+        // 다중 파일 및 섬네일 상태 변수
+        let selectedFiles = []; // { file: File, id: null, isExisting: false, displayName: '...' }
         let thumbnailIndex = -1;
         let globalAdjustments = {};
 
@@ -660,7 +663,8 @@
             return fSafeKey(s) + "_" + fSafeKey(name);
         }
 
-        // ?곹뭹 紐⑸줉 ???遺꾨쪟 ?좏깮 ?몃뱾??        function selectManageTab(tab) {
+        // 상품 목록 탭 대분류 선택 핸들러
+        function selectManageTab(tab) {
             currentManageTab = tab;
             currentSubTab = "all";
             document.querySelectorAll('[data-manage-tab]').forEach(btn => {
@@ -670,7 +674,8 @@
             renderProductsList();
         }
 
-        // ?곹뭹 紐⑸줉 ?뚮텇瑜??섏쐞 ???좏깮 ?몃뱾??        function selectManageSubTab(subTab) {
+        // 상품 목록 소분류 하위 탭 선택 핸들러
+        function selectManageSubTab(subTab) {
             currentSubTab = subTab;
             document.querySelectorAll('.sub-tab-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.subTab === subTab);
@@ -678,28 +683,28 @@
             renderProductsList();
         }
 
-        // textarea ?믪씠 ?먮룞 議곗젅 ?⑥닔
+        // textarea 높이 자동 조절 함수
         function autoResizeTextarea(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         }
 
-        // ?섏쐞 ???숈쟻 鍮뚮뱶 ?⑥닔
+        // 하위 탭 동적 빌드 함수
         function buildSubTabs() {
             const subContainer = document.getElementById('sub-products-list-tabs');
             subContainer.innerHTML = '';
             
             if (currentManageTab === 'reserve') {
-                // 怨듬룞援щℓ ?곹뭹 以?怨좎쑀???좎쭨(date) 紐⑸줉 異붿텧
+                // 공동구매 상품 중 고유한 날짜(date) 목록 추출
                 const dates = [];
                 products.forEach(prod => {
                     const mKey = prod.matchKey || "";
                     let tabType = "reserve";
-                    if (mKey.includes("?됰룞") || mKey.includes("?됱옣") || mKey.includes("?곸삩") || mKey.includes("?ㅼ삩") || mKey.includes("?곸떆?먮ℓ") || mKey.includes("?꾩옣?먮ℓ")) {
+                    if (mKey.includes("냉동") || mKey.includes("냉장") || mKey.includes("상온") || mKey.includes("실온") || mKey.includes("상시판매") || mKey.includes("현장판매")) {
                         tabType = "onsite";
-                    } else if (mKey.includes("?덉빟") && (mKey.includes("怨쇱씪") || mKey.includes("?쇱콈") || mKey.includes("湲고?"))) {
+                    } else if (mKey.includes("예약") && (mKey.includes("과일") || mKey.includes("야채") || mKey.includes("기타"))) {
                         tabType = "fruit";
-                    } else if (mKey.includes("肄붿뒪?몄퐫")) {
+                    } else if (mKey.includes("코스트코")) {
                         tabType = "costco";
                     }
                     
@@ -710,31 +715,32 @@
                     }
                 });
                 
-                // ?좎쭨 理쒖떊??(?대┝李⑥닚) ?뺣젹
+                // 날짜 최신순 (내림차순) 정렬
                 dates.sort((a, b) => b.localeCompare(a));
                 
                 if (dates.length > 0) {
                     subContainer.style.display = 'flex';
                     
-                    // "?꾩껜" ??異붽?
+                    // "전체" 탭 추가
                     const allBtn = document.createElement('button');
                     allBtn.type = 'button';
                     allBtn.className = 'sub-tab-btn active';
                     allBtn.dataset.subTab = 'all';
-                    allBtn.innerText = '?꾩껜';
+                    allBtn.innerText = '전체';
                     allBtn.onclick = () => selectManageSubTab('all');
                     subContainer.appendChild(allBtn);
                     
-                    // ?좎쭨 ??異붽?
+                    // 날짜 탭 추가
                     dates.forEach(date => {
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = 'sub-tab-btn';
                         btn.dataset.subTab = date;
                         
-                        // ?좎쭨媛 YYYY-MM-DD ?뺤떇??寃쎌슦 MM/DD (?붿씪) ?뺤떇?쇰줈 ?덉걯寃?蹂??                        let displayDate = date;
+                        // 날짜가 YYYY-MM-DD 형식일 경우 MM/DD (요일) 형식으로 예쁘게 변환
+                        let displayDate = date;
                         if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-                            const daysOfWeek = ['??, '??, '??, '??, '紐?, '湲?, '??];
+                            const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
                             const parts = date.split('-');
                             const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
                             if (!isNaN(d.getTime())) {
@@ -754,13 +760,13 @@
             else if (currentManageTab === 'onsite') {
                 subContainer.style.display = 'flex';
                 
-                const categories = ['all', '?됰룞', '?됱옣', '?곸삩'];
+                const categories = ['all', '냉동', '냉장', '상온'];
                 categories.forEach(cat => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'sub-tab-btn' + (cat === 'all' ? ' active' : '');
                     btn.dataset.subTab = cat;
-                    btn.innerText = cat === 'all' ? '?꾩껜' : (cat === '?됰룞' ? '?쭒?됰룞' : cat === '?됱옣' ? '?꾬툘?됱옣' : cat === '?곸삩' ? '?뙜截륁긽?? : cat);
+                    btn.innerText = cat === 'all' ? '전체' : (cat === '냉동' ? '🧊냉동' : cat === '냉장' ? '❄️냉장' : cat === '상온' ? '🌡️상온' : cat);
                     btn.onclick = () => selectManageSubTab(cat);
                     subContainer.appendChild(btn);
                 });
@@ -770,23 +776,25 @@
             }
         }
 
-        // ??퀎 移댄뀒怨좊━ 援ъ꽦 ?뺤쓽
-        const onsiteCategories = ["?됰룞", "?됱옣", "?곸삩"];
+        // 탭별 카테고리 구성 정의
+        const onsiteCategories = ["냉동", "냉장", "상온"];
         const fruitCategories = [
-            { key: "怨쇱씪_?덉빟", label: "怨쇱씪" },
-            { key: "?쇱콈_?덉빟", label: "?쇱콈" },
-            { key: "湲고?_?덉빟", label: "湲고?" }
+            { key: "과일_예약", label: "과일" },
+            { key: "야채_예약", label: "야채" },
+            { key: "기타_예약", label: "기타" }
         ];
-        const costcoCategories = ["肄붿뒪?몄퐫 ?됰룞", "肄붿뒪?몄퐫 ?됱옣", "肄붿뒪?몄퐫 ?곸삩"];
+        const costcoCategories = ["코스트코 냉동", "코스트코 냉장", "코스트코 상온"];
 
-        // ?섏씠吏 濡쒕뵫 ?꾨즺 ???ㅽ뻾
+        // 페이지 로딩 완료 시 실행
         window.addEventListener('DOMContentLoaded', () => {
-            // ?遺꾨쪟 ??뿉 留욎떠 移댄뀒怨좊━ 珥덇린??            selectMainTab('fruit');
+            // 대분류 탭에 맞춰 카테고리 초기화
+            selectMainTab('fruit');
             
-            // Firebase ?곹뭹 ?곗씠??媛?몄삤湲?            fetchProducts();
+            // Firebase 상품 데이터 가져오기
+            fetchProducts();
         });
 
-        // ???꾪솚 (?깅줉 / 愿由?
+        // 탭 전환 (등록 / 관리)
         function switchTab(target) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -801,7 +809,8 @@
             }
         }
 
-        // ?遺꾨쪟 ???좏깮 ?몃뱾??        function selectMainTab(tab) {
+        // 대분류 탭 선택 핸들러
+        function selectMainTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.segment-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === tab);
@@ -813,8 +822,8 @@
             const today = new Date().toISOString().split('T')[0];
 
             if (tab === 'reserve') {
-                // 怨듬룞援щℓ/?덉빟: 罹섎┛?붾? ?듯빐 ?덉빟 ?섎졊?쇱쓣 ?좏깮?섍쾶 ?섍굅?? ?섎룞 ?낅젰
-                document.getElementById('categoryLabel').innerText = "怨듬룞援щℓ ?좎쭨 ?좏깮";
+                // 공동구매/예약: 캘린더를 통해 예약 수령일을 선택하게 하거나, 수동 입력
+                document.getElementById('categoryLabel').innerText = "공동구매 날짜 선택";
                 const input = document.createElement('input');
                 input.type = 'date';
                 input.id = 'categoryValue';
@@ -826,20 +835,21 @@
                 container.appendChild(input);
             } 
             else if (tab === 'onsite') {
-                // ?꾩옣 ?먮ℓ: ?됰룞/?됱옣/?곸삩 ??遺꾨쪟 ?좏깮
-                document.getElementById('categoryLabel').innerText = "蹂닿?/遺꾨쪟 移댄뀒怨좊━";
+                // 현장 판매: 냉동/냉장/상온 등 분류 선택
+                document.getElementById('categoryLabel').innerText = "보관/분류 카테고리";
                 const select = document.createElement('select');
                 select.id = 'categoryValue';
                 onsiteCategories.forEach(cat => {
                     const opt = document.createElement('option');
                     opt.value = cat;
-                    opt.innerText = (cat === "?됰룞" ? "?쭒?됰룞" : cat === "?됱옣" ? "?꾬툘?됱옣" : cat === "?곸삩" ? "?뙜截륁긽?? : cat);
+                    opt.innerText = (cat === "냉동" ? "🧊냉동" : cat === "냉장" ? "❄️냉장" : cat === "상온" ? "🌡️상온" : cat);
                     select.appendChild(opt);
                 });
                 container.appendChild(select);
             } 
             else if (tab === 'fruit') {
-                // 怨쇱씪/?쇱콈: ?꾩슜 ?덉빟 ???ㅼ썙??                document.getElementById('categoryLabel').innerText = "怨쇱콈瑜?遺꾨쪟 ?좏깮";
+                // 과일/야채: 전용 예약 탭 키워드
+                document.getElementById('categoryLabel').innerText = "과채류 분류 선택";
                 const select = document.createElement('select');
                 select.id = 'categoryValue';
                 fruitCategories.forEach(cat => {
@@ -851,8 +861,8 @@
                 container.appendChild(select);
             } 
             else if (tab === 'costco') {
-                // 肄붿뒪?몄퐫: 肄붿뒪?몄퐫 ?뚮텇瑜??좏깮
-                document.getElementById('categoryLabel').innerText = "肄붿뒪?몄퐫 ?뚮텇瑜??좏깮";
+                // 코스트코: 코스트코 소분류 선택
+                document.getElementById('categoryLabel').innerText = "코스트코 소분류 선택";
                 const select = document.createElement('select');
                 select.id = 'categoryValue';
                 costcoCategories.forEach(cat => {
@@ -866,7 +876,7 @@
         }
 
 
-        // ?ш퀬 臾댁젣???꾪솚
+        // 재고 무제한 전환
         function toggleUnlimitedStock() {
             const isUnlimited = document.getElementById('unlimitedStock').checked;
             const stockInput = document.getElementById('productStock');
@@ -880,11 +890,13 @@
             }
         }
 
-        // ?대?吏 ?뚯씪 釉뚮씪?곗? ?몃━嫄?        function triggerFileInput() {
+        // 이미지 파일 브라우저 트리거
+        function triggerFileInput() {
             document.getElementById('imageFile').click();
         }
 
-        // ?ㅼ쨷 ?뚯씪 ?좏깮 諛??뚮뜑留??몃뱾??        function handleFileSelection(event) {
+        // 다중 파일 선택 및 렌더링 핸들러
+        function handleFileSelection(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
             
@@ -927,9 +939,9 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
                         <input type="radio" name="thumbnailSelect" id="thumb_${idx}" ${isChecked ? 'checked' : ''} onchange="setThumbnail(${idx})" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary);">
                         <span style="font-size: 13px; font-weight: 600; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; flex: 1;" onclick="setThumbnail(${idx})">
-                            ?뱞 ${item.displayName}
+                            📄 ${item.displayName}
                         </span>
-                        ${isChecked ? '<span style="color: var(--primary); font-size: 11px; font-weight: 800; background: var(--primary-light); padding: 2px 6px; border-radius: 4px; flex-shrink: 0;">????щ꽕??/span>' : ''}
+                        ${isChecked ? '<span style="color: var(--primary); font-size: 11px; font-weight: 800; background: var(--primary-light); padding: 2px 6px; border-radius: 4px; flex-shrink: 0;">대표 섬네일</span>' : ''}
                     </div>
                     <button type="button" onclick="removeSelectedFile(${idx})" style="background: none; border: none; color: var(--danger); font-size: 18px; font-weight: bold; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
                 `;
@@ -954,18 +966,19 @@
             renderSelectedFilesList();
         }
 
-        // 濡쒕뜑 議곗젅
-        function showLoader(text = "泥섎━ 以묒엯?덈떎...") {
+        // 로더 조절
+        function showLoader(text = "처리 중입니다...") {
             document.getElementById('loader-text').innerText = text;
             document.getElementById('loader').style.display = 'flex';
         }
 
-        // 濡쒕뜑 ?リ린
+        // 로더 닫기
         function hideLoader() {
             document.getElementById('loader').style.display = 'none';
         }
 
-        // ?좎뒪???꾩슦湲?        function showToast(msg) {
+        // 토스트 띄우기
+        function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
             toast.classList.add('show');
@@ -974,13 +987,14 @@
             }, 3000);
         }
 
-        // Firebase?먯꽌 ?곹뭹 媛?몄삤湲?        async function fetchProducts() {
+        // Firebase에서 상품 가져오기
+        async function fetchProducts() {
             try {
                 const [res, stockRes] = await Promise.all([
                     fetch(`${FIREBASE_DB_URL}published_products.json?t=${Date.now()}`),
-                    fetch(`${FIREBASE_DB_URL}global_stock.json?t=${Date.now()}`).catch(e => { console.error("Firebase ?ш퀬 濡쒕뱶 ?ㅽ뙣:", e); return { ok: false }; })
+                    fetch(`${FIREBASE_DB_URL}global_stock.json?t=${Date.now()}`).catch(e => { console.error("Firebase 재고 로드 실패:", e); return { ok: false }; })
                 ]);
-                if (!res.ok) throw new Error("Firebase ?곌껐 ?ㅽ뙣");
+                if (!res.ok) throw new Error("Firebase 연결 실패");
                 
                 const data = await res.json();
                 if (stockRes && stockRes.ok) {
@@ -997,12 +1011,12 @@
                     products = Object.values(data);
                 }
 
-                // 湲곗〈 ?대え吏媛 ?ы븿??移댄뀒怨좊━媛??뺢퇋??(?섏쐞 ?명솚??蹂댁옣)
+                // 기존 이모지가 포함된 카테고리값 정규화 (하위 호환성 보장)
                 products.forEach(prod => {
                     if (prod && prod.matchKey) {
-                        if (prod.matchKey === "?쭒?됰룞") prod.matchKey = "?됰룞";
-                        else if (prod.matchKey === "?꾬툘?됱옣") prod.matchKey = "?됱옣";
-                        else if (prod.matchKey === "?뙜截륁긽??) prod.matchKey = "?곸삩";
+                        if (prod.matchKey === "🧊냉동") prod.matchKey = "냉동";
+                        else if (prod.matchKey === "❄️냉장") prod.matchKey = "냉장";
+                        else if (prod.matchKey === "🌡️상온") prod.matchKey = "상온";
                     }
                 });
 
@@ -1010,31 +1024,33 @@
                 buildSubTabs();
                 renderProductsList();
             } catch (e) {
-                console.error("?곗씠??濡쒕뱶 ?ㅽ뙣:", e);
-                showToast("?곗씠??濡쒕뱶???ㅽ뙣?덉뒿?덈떎.");
+                console.error("데이터 로드 실패:", e);
+                showToast("데이터 로드에 실패했습니다.");
             }
         }
 
-        // ?곹뭹 紐⑸줉 洹몃━湲?        function renderProductsList() {
+        // 상품 목록 그리기
+        function renderProductsList() {
             const container = document.getElementById('products-list-container');
             container.innerHTML = '';
 
             if (products.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">?깅줉???곹뭹???놁뒿?덈떎.</div>`;
+                container.innerHTML = `<div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">등록된 상품이 없습니다.</div>`;
                 return;
             }
 
-            // 1. ?꾩옱 ?좏깮??愿由???뿉 留욎떠 ?곹뭹 ?꾪꽣留?            let filteredProducts = products.map((prod, index) => ({ prod, index }));
+            // 1. 현재 선택된 관리 탭에 맞춰 상품 필터링
+            let filteredProducts = products.map((prod, index) => ({ prod, index }));
             
             if (currentManageTab !== 'all') {
                 filteredProducts = filteredProducts.filter(({ prod }) => {
                     const mKey = prod.matchKey || "";
                     let tabType = "reserve";
-                    if (mKey.includes("?됰룞") || mKey.includes("?됱옣") || mKey.includes("?곸삩") || mKey.includes("?ㅼ삩") || mKey.includes("?곸떆?먮ℓ") || mKey.includes("?꾩옣?먮ℓ")) {
+                    if (mKey.includes("냉동") || mKey.includes("냉장") || mKey.includes("상온") || mKey.includes("실온") || mKey.includes("상시판매") || mKey.includes("현장판매")) {
                         tabType = "onsite";
-                    } else if (mKey.includes("?덉빟") && (mKey.includes("怨쇱씪") || mKey.includes("?쇱콈") || mKey.includes("湲고?"))) {
+                    } else if (mKey.includes("예약") && (mKey.includes("과일") || mKey.includes("야채") || mKey.includes("기타"))) {
                         tabType = "fruit";
-                    } else if (mKey.includes("肄붿뒪?몄퐫")) {
+                    } else if (mKey.includes("코스트코")) {
                         tabType = "costco";
                     } else {
                         tabType = "reserve";
@@ -1043,7 +1059,7 @@
                 });
             }
 
-            // 1.5. ?섏쐞 ?뚮텇瑜??꾪꽣留??곸슜
+            // 1.5. 하위 소분류 필터링 적용
             if (currentSubTab !== 'all') {
                 filteredProducts = filteredProducts.filter(({ prod }) => {
                     if (currentManageTab === 'reserve') {
@@ -1056,61 +1072,64 @@
             }
 
             if (filteredProducts.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">?대떦 移댄뀒怨좊━???깅줉???곹뭹???놁뒿?덈떎.</div>`;
+                container.innerHTML = `<div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">해당 카테고리에 등록된 상품이 없습니다.</div>`;
                 return;
             }
 
-            // 2. 移댄뀒怨좊━(matchKey)蹂꾨줈 ?곹뭹 洹몃９??            const grouped = {};
+            // 2. 카테고리(matchKey)별로 상품 그룹화
+            const grouped = {};
             filteredProducts.forEach(({ prod, index }) => {
-                const mKey = prod.matchKey || "湲고?";
+                const mKey = prod.matchKey || "기타";
                 if (!grouped[mKey]) {
                     grouped[mKey] = [];
                 }
                 grouped[mKey].push({ prod, index });
             });
 
-            // 2. 洹몃９ ?뺣젹 ?쒖꽌 ?뺤쓽
+            // 2. 그룹 정렬 순서 정의
             const groupKeys = Object.keys(grouped).sort((a, b) => {
                 const isDateA = /^\d{4}-\d{2}-\d{2}$/.test(a);
                 const isDateB = /^\d{4}-\d{2}-\d{2}$/.test(b);
-                if (isDateA && isDateB) return b.localeCompare(a); // ?좎쭨 理쒖떊??                if (isDateA) return -1;
+                if (isDateA && isDateB) return b.localeCompare(a); // 날짜 최신순
+                if (isDateA) return -1;
                 if (isDateB) return 1;
                 
-                if (a.includes("肄붿뒪?몄퐫") && b.includes("肄붿뒪?몄퐫")) return a.localeCompare(b);
-                if (a.includes("肄붿뒪?몄퐫")) return 1;
-                if (b.includes("肄붿뒪?몄퐫")) return -1;
+                if (a.includes("코스트코") && b.includes("코스트코")) return a.localeCompare(b);
+                if (a.includes("코스트코")) return 1;
+                if (b.includes("코스트코")) return -1;
                 
                 return a.localeCompare(b);
             });
 
-            // 3. 洹몃９蹂??뚮뜑留?            groupKeys.forEach(mKey => {
+            // 3. 그룹별 렌더링
+            groupKeys.forEach(mKey => {
                 const groupItems = grouped[mKey];
                 
                 let groupLabel = mKey;
                 let badgeClass = 'badge-reserve';
                 if (/^\d{4}-\d{2}-\d{2}$/.test(mKey)) {
-                    const daysOfWeek = ['??, '??, '??, '??, '紐?, '湲?, '??];
+                    const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
                     const parts = mKey.split('-');
                     const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
                     if (!isNaN(d.getTime())) {
-                        groupLabel = `?뱟 怨듬룞援щℓ | ${parts[0]}??${parseInt(parts[1])}??${parseInt(parts[2])}??(${daysOfWeek[d.getDay()]})`;
+                        groupLabel = `📅 공동구매 | ${parts[0]}년 ${parseInt(parts[1])}월 ${parseInt(parts[2])}일 (${daysOfWeek[d.getDay()]})`;
                     } else {
-                        groupLabel = `?뱟 怨듬룞援щℓ | ${mKey}`;
+                        groupLabel = `📅 공동구매 | ${mKey}`;
                     }
                     badgeClass = 'badge-reserve';
-                } else if (mKey === '怨쇱씪_?덉빟' || mKey === '?쇱콈_?덉빟' || mKey === '湲고?_?덉빟') {
-                    const label = mKey === '怨쇱씪_?덉빟' ? '怨쇱씪' : (mKey === '?쇱콈_?덉빟' ? '?쇱콈' : '湲고?');
-                    groupLabel = `?뜐 怨쇱씪/?쇱콈 | ${label}`;
+                } else if (mKey === '과일_예약' || mKey === '야채_예약' || mKey === '기타_예약') {
+                    const label = mKey === '과일_예약' ? '과일' : (mKey === '야채_예약' ? '야채' : '기타');
+                    groupLabel = `🍓 과일/야채 | ${label}`;
                     badgeClass = 'badge-fruit';
-                } else if (mKey.includes("肄붿뒪?몄퐫")) {
-                    groupLabel = `?썟 肄붿뒪?몄퐫 | ${mKey.replace("肄붿뒪?몄퐫", "").trim()}`;
+                } else if (mKey.includes("코스트코")) {
+                    groupLabel = `🛒 코스트코 | ${mKey.replace("코스트코", "").trim()}`;
                     badgeClass = 'badge-costco';
                 } else {
-                    groupLabel = `?룵 ?곸떆?먮ℓ | ${mKey}`;
+                    groupLabel = `🏪 상시판매 | ${mKey}`;
                     badgeClass = 'badge-onsite';
                 }
 
-                // 移댄뀒怨좊━ ?ㅻ뜑
+                // 카테고리 헤더
                 const headerDiv = document.createElement('div');
                 headerDiv.style = "font-size: 13px; font-weight: 850; color: var(--text-main); margin-top: 18px; margin-bottom: 8px; padding: 6px 12px; background-color: #f1f5f9; border-radius: 6px; display: flex; align-items: center; gap: 6px;";
                 
@@ -1121,10 +1140,10 @@
                 else borderStyle = "border-left: 4px solid #475569;";
                 headerDiv.style.cssText += borderStyle;
 
-                headerDiv.innerHTML = `${groupLabel} (${groupItems.length}媛?`;
+                headerDiv.innerHTML = `${groupLabel} (${groupItems.length}개)`;
                 container.appendChild(headerDiv);
 
-                // 洹몃９蹂??곹뭹 臾띠쓬 諛뺤뒪
+                // 그룹별 상품 묶음 박스
                 const listWrapper = document.createElement('div');
                 listWrapper.style = "background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; display: flex; flex-direction: column;";
 
@@ -1134,48 +1153,48 @@
                         : '';
 
                     const baseStockStr = prod.stock;
-                    const isUnlimited = (baseStockStr === "" || baseStockStr === "unlimited" || baseStockStr === 9999 || baseStockStr === "9999" || baseStockStr === "臾댁젣??);
+                    const isUnlimited = (baseStockStr === "" || baseStockStr === "unlimited" || baseStockStr === 9999 || baseStockStr === "9999" || baseStockStr === "무제한");
                     
                     let stockHtml = "";
                     const adjKey = fGetAdjKey(prod.matchKey || prod.date || "", prod.name);
-                    const adj = globalAdjustments[adjKey];
+                    const adj = globalAdjustments[encodeURIComponent(adjKey)] || globalAdjustments[adjKey];
                     const orderQty = (adj && !isNaN(parseInt(adj))) ? -parseInt(adj) : 0;
 
                     if (isUnlimited) {
                         if (orderQty > 0) {
-                            stockHtml = `<strong style="color: var(--text-main);">臾댁젣??/strong> <span style="font-size: 11px; color: var(--secondary); font-weight: normal;">(二쇰Ц: ${orderQty}媛?</span>`;
+                            stockHtml = `<strong style="color: var(--text-main);">무제한</strong> <span style="font-size: 11px; color: var(--secondary); font-weight: normal;">(주문: ${orderQty}개)</span>`;
                         } else {
-                            stockHtml = `<strong style="color: var(--text-main);">臾댁젣??/strong>`;
+                            stockHtml = `<strong style="color: var(--text-main);">무제한</strong>`;
                         }
                     } else {
                         const baseStock = parseInt(baseStockStr || 0);
                         const remainingStock = Math.max(0, baseStock - orderQty);
                         
                         if (orderQty > 0) {
-                            stockHtml = `<strong style="color: var(--text-main);">${remainingStock}媛?/strong> <span style="font-size: 11px; color: var(--text-sub); font-weight: normal;">(湲곕낯: ${baseStock}媛?/ 二쇰Ц: <span style="color: var(--secondary); font-weight: bold;">${orderQty}媛?/span>)</span>`;
+                            stockHtml = `<strong style="color: var(--text-main);">${remainingStock}개</strong> <span style="font-size: 11px; color: var(--text-sub); font-weight: normal;">(기본: ${baseStock}개 / 주문: <span style="color: var(--secondary); font-weight: bold;">${orderQty}개</span>)</span>`;
                         } else {
-                            stockHtml = `<strong style="color: var(--text-main);">${baseStock}媛?/strong>`;
+                            stockHtml = `<strong style="color: var(--text-main);">${baseStock}개</strong>`;
                         }
                     }
 
                     const item = document.createElement('div');
                     item.className = 'product-item';
                     item.innerHTML = `
-                        ${imgUrl ? `<img src="${imgUrl}" class="product-img" alt="?곹뭹 ?대?吏">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">?벀</div>`}
+                        ${imgUrl ? `<img src="${imgUrl}" class="product-img" alt="상품 이미지">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>`}
                         <div class="product-info">
                             <div>
                                 <div class="product-name" style="font-size: 14px; font-weight: 700; color: var(--text-main);">${prod.name}</div>
                                 <div style="font-size: 11px; color: var(--text-sub); margin-top: 2px;">
-                                    ${prod.desc ? prod.desc.substring(0, 40) + (prod.desc.length > 40 ? '...' : '') : '?ㅻ챸 ?놁쓬'}
+                                    ${prod.desc ? prod.desc.substring(0, 40) + (prod.desc.length > 40 ? '...' : '') : '설명 없음'}
                                 </div>
                             </div>
                             <div style="margin-top: 6px;">
                                 <div class="product-price-stock" style="font-size: 12px; font-weight: 600; color: var(--text-sub);">
-                                    媛寃? <strong style="color: var(--text-main);">${prod.price.toLocaleString()}??/strong> / ?ш퀬: ${stockHtml}
+                                    가격: <strong style="color: var(--text-main);">${prod.price.toLocaleString()}원</strong> / 재고: ${stockHtml}
                                 </div>
                                 <div class="product-actions" style="margin-top: 8px;">
-                                    <button type="button" class="action-btn action-edit" onclick="startEdit(${index})">?륅툘 ?섏젙</button>
-                                    <button type="button" class="action-btn action-delete" onclick="deleteProduct(${index})">?뿊截???젣</button>
+                                    <button type="button" class="action-btn action-edit" onclick="startEdit(${index})">✏️ 수정</button>
+                                    <button type="button" class="action-btn action-delete" onclick="deleteProduct(${index})">🗑️ 삭제</button>
                                 </div>
                             </div>
                         </div>
@@ -1186,7 +1205,7 @@
             });
         }
 
-        // ?곹뭹 ?뺣낫 ?섏젙 紐⑤뱶濡??꾪솚
+        // 상품 정보 수정 모드로 전환
         function startEdit(index) {
             const prod = products[index];
             if (!prod) return;
@@ -1194,7 +1213,7 @@
             isEditMode = true;
             editProductKey = index;
 
-            // ???꾨뱶 ?낅젰媛??명똿
+            // 폼 필드 입력값 세팅
             document.getElementById('productName').value = prod.name;
             document.getElementById('productPrice').value = prod.price;
             selectedDate = prod.date || new Date().toISOString().split('T')[0];
@@ -1213,14 +1232,14 @@
                 stockInput.disabled = false;
             }
 
-            // ?遺꾨쪟 ?먮퀎 諛???留ㅼ묶
+            // 대분류 판별 및 탭 매칭
             const mKey = prod.matchKey || "";
             let tabType = "reserve";
-            if (mKey.includes("?됰룞") || mKey.includes("?됱옣") || mKey.includes("?곸삩") || mKey.includes("?ㅼ삩") || mKey.includes("?곸떆?먮ℓ") || mKey.includes("?꾩옣?먮ℓ")) {
+            if (mKey.includes("냉동") || mKey.includes("냉장") || mKey.includes("상온") || mKey.includes("실온") || mKey.includes("상시판매") || mKey.includes("현장판매")) {
                 tabType = "onsite";
-            } else if (mKey.includes("?덉빟") && (mKey.includes("怨쇱씪") || mKey.includes("?쇱콈") || mKey.includes("湲고?"))) {
+            } else if (mKey.includes("예약") && (mKey.includes("과일") || mKey.includes("야채") || mKey.includes("기타"))) {
                 tabType = "fruit";
-            } else if (mKey.includes("肄붿뒪?몄퐫")) {
+            } else if (mKey.includes("코스트코")) {
                 tabType = "costco";
             } else {
                 tabType = "reserve";
@@ -1228,7 +1247,7 @@
 
             selectMainTab(tabType);
 
-            // ?몃? 移댄뀒怨좊━ 媛?蹂듭썝
+            // 세부 카테고리 값 복원
             setTimeout(() => {
                 const catVal = document.getElementById('categoryValue');
                 if (catVal) {
@@ -1236,7 +1255,7 @@
                 }
             }, 50);
 
-            // ?대?吏 紐⑸줉 泥섎━
+            // 이미지 목록 처리
             selectedFiles = [];
             thumbnailIndex = -1;
             
@@ -1246,92 +1265,96 @@
                         file: null,
                         id: imgId,
                         isExisting: true,
-                        displayName: `湲곗〈 ?ъ쭊 ${idx + 1}`
+                        displayName: `기존 사진 ${idx + 1}`
                     });
                 });
-                thumbnailIndex = 0; // 泥?踰덉㎏ ?대?吏瑜?????щ꽕?쇰줈 湲곕낯 吏??            }
+                thumbnailIndex = 0; // 첫 번째 이미지를 대표 섬네일로 기본 지정
+            }
             
             renderSelectedFilesList();
 
-            // UI 蹂寃?            document.getElementById('form-card-title').innerText = "?륅툘 ?곹뭹 ?뺣낫 ?섏젙";
+            // UI 변경
+            document.getElementById('form-card-title').innerText = "✏️ 상품 정보 수정";
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "?뮶 ?곹뭹 ?뺣낫 ?섏젙 ???;
+            submitBtn.innerText = "💾 상품 정보 수정 저장";
             submitBtn.classList.add('edit-mode');
             document.getElementById('cancelBtn').style.display = 'block';
 
-            // ???꾪솚
+            // 탭 전환
             switchTab('upload');
 
-            // ??씠 ?붾㈃???뚮뜑留곷맂 ?댄썑 ?믪씠瑜?媛먯??????덈룄濡??쎄컙???쒓컙李⑤? ??            setTimeout(() => {
+            // 탭이 화면에 렌더링된 이후 높이를 감지할 수 있도록 약간의 시간차를 둠
+            setTimeout(() => {
                 autoResizeTextarea(descTextarea);
             }, 50);
         }
 
-        // ?섏젙 紐⑤뱶 ?댁젣
+        // 수정 모드 해제
         function exitEditMode() {
             isEditMode = false;
             editProductKey = null;
             uploadedImageId = null;
 
-            // ??珥덇린??            document.getElementById('productForm').reset();
+            // 폼 초기화
+            document.getElementById('productForm').reset();
             document.getElementById('productStock').disabled = false;
             
             const descTextarea = document.getElementById('productDesc');
             descTextarea.style.height = 'auto';
             
-            // ?뚯씪 紐⑸줉 由ъ뀑
+            // 파일 목록 리셋
             selectedFiles = [];
             thumbnailIndex = -1;
             renderSelectedFilesList();
 
-            // UI 蹂듦뎄
-            document.getElementById('form-card-title').innerText = "???좉퇋 ?곹뭹 ?깅줉";
+            // UI 복구
+            document.getElementById('form-card-title').innerText = "✨ 신규 상품 등록";
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "?? ?곹뭹 ?깅줉 ?꾨즺";
+            submitBtn.innerText = "🚀 상품 등록 완료";
             submitBtn.classList.remove('edit-mode');
             document.getElementById('cancelBtn').style.display = 'none';
 
-            // ?ㅻ뒛 ?좎쭨 ?명똿
+            // 오늘 날짜 세팅
             selectedDate = new Date().toISOString().split('T')[0];
             selectMainTab('fruit');
         }
 
-        // ?곹뭹 ?뺣낫 ??젣
+        // 상품 정보 삭제
         async function deleteProduct(index) {
             const prod = products[index];
             if (!prod) return;
 
-            if (!confirm(`[${prod.name}] ?곹뭹???뺣쭚 ??젣?섏떆寃좎뒿?덇퉴?\n??젣 利됱떆 二쇰Ц???깆뿉???щ씪吏묐땲??`)) return;
+            if (!confirm(`[${prod.name}] 상품을 정말 삭제하시겠습니까?\n삭제 즉시 주문서 앱에서 사라집니다.`)) return;
 
-            showLoader("?곹뭹 ?뺣낫 ??젣 以?..");
+            showLoader("상품 정보 삭제 중...");
             try {
-                // ?대떦 ?곹뭹 ?쒖쇅?섍퀬 ?덈줈??諛곗뿴 援ъ꽦
+                // 해당 상품 제외하고 새로운 배열 구성
                 const updatedList = products.filter((_, idx) => idx !== index);
                 
-                // Firebase PUT ?붿껌 ?꾩넚
+                // Firebase PUT 요청 전송
                 const res = await fetch(`${FIREBASE_DB_URL}published_products.json`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updatedList)
                 });
 
-                if (!res.ok) throw new Error("Firebase ??젣 ?숆린???ㅽ뙣");
+                if (!res.ok) throw new Error("Firebase 삭제 동기화 실패");
 
                 products = updatedList;
                 document.getElementById('product-count').innerText = products.length;
                 
-                showToast("?곹뭹???깃났?곸쑝濡???젣?섏뿀?듬땲??");
+                showToast("상품이 성공적으로 삭제되었습니다.");
                 buildSubTabs();
                 renderProductsList();
             } catch (e) {
-                console.error("??젣 以??ㅻ쪟 諛쒖깮:", e);
-                showToast("??젣?섏? 紐삵뻽?듬땲?? " + e.toString());
+                console.error("삭제 중 오류 발생:", e);
+                showToast("삭제하지 못했습니다: " + e.toString());
             } finally {
                 hideLoader();
             }
         }
 
-        // ???쒖텧 (???/ ?깅줉)
+        // 폼 제출 (저장 / 등록)
         async function submitForm(event) {
             event.preventDefault();
 
@@ -1343,30 +1366,31 @@
             let stock = isUnlimited ? "" : parseInt(document.getElementById('productStock').value);
             if (isUnlimited) stock = "";
 
-            // 留ㅼ튂 ??諛??좎쭨 ?뺤쓽
+            // 매치 키 및 날짜 정의
             const catVal = document.getElementById('categoryValue').value;
             let matchKey = catVal;
             let date = "";
             if (currentTab === 'reserve') {
-                matchKey = catVal; // ?좎쭨 臾몄옄??(YYYY-MM-DD)
-                date = catVal;      // ?좎쭨 臾몄옄??(YYYY-MM-DD)
+                matchKey = catVal; // 날짜 문자열 (YYYY-MM-DD)
+                date = catVal;      // 날짜 문자열 (YYYY-MM-DD)
             }
 
             if (!name) {
-                showToast("?곹뭹紐낆쓣 ?낅젰?댁＜?몄슂.");
+                showToast("상품명을 입력해주세요.");
                 return;
             }
 
             try {
                 const finalImages = [];
                 
-                // 1. ?쒖감?곸쑝濡??덈줈???ъ쭊 ?뚯씪?ㅼ쓣 Google Drive???낅줈??                for (let i = 0; i < selectedFiles.length; i++) {
+                // 1. 순차적으로 새로운 사진 파일들을 Google Drive에 업로드
+                for (let i = 0; i < selectedFiles.length; i++) {
                     const item = selectedFiles[i];
                     if (item.isExisting) {
                         continue;
                     }
                     
-                    showLoader(`?벝 ?ъ쭊 ?낅줈??以?(${i + 1}/${selectedFiles.length}): ${item.displayName}`);
+                    showLoader(`📸 사진 업로드 중 (${i + 1}/${selectedFiles.length}): ${item.displayName}`);
                     const base64Data = await getCompressedBase64(item.file);
                     
                     const payload = {
@@ -1385,18 +1409,18 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!response.ok) throw new Error(`[${item.displayName}] ?대?吏 ?낅줈???ㅽ뙣`);
+                    if (!response.ok) throw new Error(`[${item.displayName}] 이미지 업로드 실패`);
                     const resJson = await response.json();
                     
                     if (resJson.result === 'success') {
-                        // ?????fileId, id, fileid) ?숈떆 留ㅽ븨 吏?먯쑝濡??명솚??100% 蹂댁옣
+                        // 대안 키(fileId, id, fileid) 동시 매핑 지원으로 호환성 100% 보장
                         item.id = resJson.fileId || resJson.id || resJson.fileid || null;
                     } else {
-                        throw new Error(resJson.message || "?대?吏 ?쒕쾭 ?묐떟 ?먮윭");
+                        throw new Error(resJson.message || "이미지 서버 응답 에러");
                     }
                 }
 
-                // 2. ?щ꽕??????대?吏)濡?吏?뺣맂 ID媛 諛곗뿴??0踰덉㎏ ?몃뜳?ㅼ뿉 ?ㅻ룄濡??뺣젹?섏뿬 理쒖쥌 諛곗뿴 援ъ꽦
+                // 2. 섬네일(대표 이미지)로 지정된 ID가 배열의 0번째 인덱스에 오도록 정렬하여 최종 배열 구성
                 if (thumbnailIndex >= 0 && thumbnailIndex < selectedFiles.length) {
                     const thumb = selectedFiles[thumbnailIndex];
                     if (thumb.id) finalImages.push(thumb.id);
@@ -1407,8 +1431,8 @@
                     }
                 });
 
-                // Firebase ?곗씠??諛고룷
-                showLoader("?뮶 Firebase 二쇰Ц???곗씠?곕쿋?댁뒪 諛섏쁺 以?..");
+                // Firebase 데이터 배포
+                showLoader("💾 Firebase 주문서 데이터베이스 반영 중...");
 
                 const productObj = {
                     name: name,
@@ -1424,12 +1448,13 @@
                 let updatedProducts = [...products];
 
                 if (isEditMode && editProductKey !== null) {
-                    // ?섏젙 紐⑤뱶: 湲곗〈 ??ぉ ?낅뜲?댄듃
+                    // 수정 모드: 기존 항목 업데이트
                     updatedProducts[editProductKey] = productObj;
                 } else {
-                    // ?깅줉 紐⑤뱶: 湲곗〈 紐⑸줉???숈씪???대쫫&?좎쭨媛 ?덈뒗吏 以묐났 寃??                    const dupIndex = updatedProducts.findIndex(p => p.name === name && p.date === date);
+                    // 등록 모드: 기존 목록에 동일한 이름&날짜가 있는지 중복 검사
+                    const dupIndex = updatedProducts.findIndex(p => p.name === name && p.date === date);
                     if (dupIndex > -1) {
-                        if (!confirm("?숈씪???좎쭨??媛숈? ?대쫫???곹뭹???대? ?깅줉?섏뼱 ?덉뒿?덈떎.\n??뼱?곗떆寃좎뒿?덇퉴?")) {
+                        if (!confirm("동일한 날짜에 같은 이름의 상품이 이미 등록되어 있습니다.\n덮어쓰시겠습니까?")) {
                             hideLoader();
                             return;
                         }
@@ -1439,36 +1464,37 @@
                     }
                 }
 
-                // [?붾쾭源??뚮┝]
-                showToast(`?붾쾭源?- ?낅줈???꾨즺 ?대?吏 ?? ${finalImages.length}媛?/ ID紐⑸줉: ${JSON.stringify(finalImages)}`);
-                await new Promise(r => setTimeout(r, 1500)); // ?좎뒪?몃? ?덉쑝濡??쎌쓣 ???덇쾶 ?좎떆 吏??
-                // Firebase PUT ?꾩넚
+                // [디버깅 알림]
+                showToast(`디버깅 - 업로드 완료 이미지 수: ${finalImages.length}개 / ID목록: ${JSON.stringify(finalImages)}`);
+                await new Promise(r => setTimeout(r, 1500)); // 토스트를 눈으로 읽을 수 있게 잠시 지연
+
+                // Firebase PUT 전송
                 const writeRes = await fetch(`${FIREBASE_DB_URL}published_products.json`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updatedProducts)
                 });
 
-                if (!writeRes.ok) throw new Error("Firebase 諛고룷 ?ㅽ뙣");
+                if (!writeRes.ok) throw new Error("Firebase 배포 실패");
 
                 products = updatedProducts;
                 document.getElementById('product-count').innerText = products.length;
 
-                showToast(isEditMode ? "?곹뭹 ?섏젙???꾨즺?섏뿀?듬땲??" : "?덈줈???곹뭹???깃났?곸쑝濡??깅줉?섏뿀?듬땲??");
+                showToast(isEditMode ? "상품 수정이 완료되었습니다!" : "새로운 상품이 성공적으로 등록되었습니다!");
                 
-                // ?곹깭 由ъ뀑 諛????대룞
+                // 상태 리셋 및 탭 이동
                 exitEditMode();
                 buildSubTabs();
                 switchTab('manage');
             } catch (e) {
-                console.error("?쒖텧 ?먮윭:", e);
-                showToast("?낅줈??以??먮윭媛 諛쒖깮?덉뒿?덈떎: " + e.toString());
+                console.error("제출 에러:", e);
+                showToast("업로드 중 에러가 발생했습니다: " + e.toString());
             } finally {
                 hideLoader();
             }
         }
 
-        // ?뚯씪??由ъ궗?댁쭠 諛?JPEG ?뺤텞?섏뿬 媛踰쇱슫 base64 ?щ㎎?쇰줈 蹂寃쏀븯??理쒖쟻???ы띁 ?⑥닔
+        // 파일을 리사이징 및 JPEG 압축하여 가벼운 base64 포맷으로 변경하는 최적화 헬퍼 함수
         function getCompressedBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1479,7 +1505,7 @@
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
-                            const maxDimension = 1024; // 理쒕? 媛濡쒖꽭濡??댁긽??1024px ?쒗븳
+                            const maxDimension = 1024; // 최대 가로세로 해상도 1024px 제한
                             let width = img.width;
                             let height = img.height;
 
@@ -1498,7 +1524,7 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
 
-                            // JPEG ?щ㎎?쇰줈 ?뺤텞 ?덉쭏 70% ?ㅼ젙 ?곸슜
+                            // JPEG 포맷으로 압축 품질 70% 설정 적용
                             const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
                             resolve(compressedBase64);
                         } catch (err) {
