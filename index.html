@@ -381,6 +381,11 @@
             border-bottom: none;
         }
 
+        .product-item.selected {
+            background-color: #eff6ff !important;
+            box-shadow: inset 0 0 0 2px var(--primary);
+        }
+
         .product-img {
             width: 70px;
             height: 70px;
@@ -1234,13 +1239,18 @@
                 else borderStyle = "border-left: 4px solid #475569;";
                 headerDiv.style.cssText += borderStyle;
 
-                const allSelected = groupItems.every(({ index }) => selectedProductIndices.has(index));
-                headerDiv.innerHTML = `
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; user-select: none;">
-                        <input type="checkbox" class="category-visibility-toggle" ${allSelected ? 'checked' : ''} onchange="toggleCategorySelection('${mKey.replace(/'/g, "\\'")}', this.checked)" style="width:16px; height:16px; cursor:pointer;">
-                        <span style="font-size: 13px; font-weight: 850;">${groupLabel} (${groupItems.length}개)</span>
-                    </label>
-                `;
+                const showHeaderCheckbox = selectedProductIndices.size > 0;
+                if (showHeaderCheckbox) {
+                    const allSelected = groupItems.every(({ index }) => selectedProductIndices.has(index));
+                    headerDiv.innerHTML = `
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; user-select: none;">
+                            <input type="checkbox" class="category-visibility-toggle" ${allSelected ? 'checked' : ''} onchange="toggleCategorySelection('${mKey.replace(/'/g, "\\'")}', this.checked)" style="width:16px; height:16px; cursor:pointer;">
+                            <span style="font-size: 13px; font-weight: 850;">${groupLabel} (${groupItems.length}개)</span>
+                        </label>
+                    `;
+                } else {
+                    headerDiv.innerHTML = `${groupLabel} (${groupItems.length}개)`;
+                }
                 container.appendChild(headerDiv);
 
                 // 그룹별 상품 묶음 박스
@@ -1280,15 +1290,27 @@
                     const isHidden = prod.hidden === true || prod.hidden === "true";
                     const isSelected = selectedProductIndices.has(index);
                     const item = document.createElement('div');
-                    item.className = 'product-item';
+                    item.className = 'product-item' + (isSelected ? ' selected' : '');
+                    
+                    // 마우스 및 터치 이벤트 추가 (길게 누르기 감지)
+                    item.addEventListener('mousedown', (e) => handleTouchStart(e, index));
+                    item.addEventListener('touchstart', (e) => handleTouchStart(e, index), { passive: false });
+                    
+                    item.addEventListener('mousemove', handleTouchMove);
+                    item.addEventListener('touchmove', handleTouchMove, { passive: true });
+                    
+                    item.addEventListener('mouseup', (e) => handleTouchEnd(e, index));
+                    item.addEventListener('touchend', (e) => handleTouchEnd(e, index));
+                    
+                    item.addEventListener('mouseleave', () => {
+                        if (longPressTimer) {
+                            clearTimeout(longPressTimer);
+                            longPressTimer = null;
+                        }
+                    });
+
                     item.innerHTML = `
-                        <div style="display:flex; align-items:center; justify-content:center; padding: 0 8px 0 0; border-right: 1.5px solid var(--border);" class="no-print">
-                            <label style="display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; font-weight:700; color:var(--text-sub); cursor:pointer; margin:0; width:45px; text-align:center; user-select:none;">
-                                <input type="checkbox" class="prod-visibility-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleProductSelection(${index}, this.checked)" style="width:18px; height:18px; cursor:pointer; margin:0 auto;">
-                                <span>선택</span>
-                            </label>
-                        </div>
-                        ${imgUrl ? `<img src="${imgUrl}" class="product-img" alt="상품 이미지">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>`}
+                        ${imgUrl ? `<img src="${imgUrl}" class="product-img" alt="상품 이미지" style="position:relative;">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;">📦</div>`}
                         <div class="product-info" style="${isHidden ? 'opacity: 0.6;' : ''}">
                             <div>
                                 <div class="product-name" style="font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
@@ -1306,8 +1328,8 @@
                                     가격: <strong style="color: var(--text-main);">${prod.price.toLocaleString()}원</strong> / 재고: ${stockHtml}
                                 </div>
                                 <div class="product-actions" style="margin-top: 8px;">
-                                    <button type="button" class="action-btn action-edit" onclick="startEdit(${index})">✏️ 수정</button>
-                                    <button type="button" class="action-btn action-delete" onclick="deleteProduct(${index})">🗑️ 삭제</button>
+                                    <button type="button" class="action-btn action-edit" onclick="startEdit(${index}); event.stopPropagation();">✏️ 수정</button>
+                                    <button type="button" class="action-btn action-delete" onclick="deleteProduct(${index}); event.stopPropagation();">🗑️ 삭제</button>
                                 </div>
                             </div>
                         </div>
@@ -1383,6 +1405,65 @@
                 showToast("변경 실패: " + e.toString());
             } finally {
                 hideLoader();
+            }
+        }
+
+        // 마우스/터치 길게 누르기 이벤트 헬퍼
+        let longPressTimer = null;
+        let touchStartPos = { x: 0, y: 0 };
+        let isLongPressTriggered = false;
+
+        function handleTouchStart(e, index) {
+            // 수정/삭제 버튼 클릭 시 무시
+            if (e.target.closest('.product-actions') || e.target.closest('.action-btn')) {
+                return;
+            }
+            
+            isLongPressTriggered = false;
+            const touch = e.touches ? e.touches[0] : e;
+            touchStartPos = { x: touch.clientX, y: touch.clientY };
+            
+            longPressTimer = setTimeout(() => {
+                isLongPressTriggered = true;
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+                // 선택 상태 전환
+                toggleProductSelection(index, !selectedProductIndices.has(index));
+                renderProductsList();
+            }, 600); // 600ms 길게 누르기 감지
+        }
+
+        function handleTouchMove(e) {
+            if (!longPressTimer) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const dx = Math.abs(touch.clientX - touchStartPos.x);
+            const dy = Math.abs(touch.clientY - touchStartPos.y);
+            if (dx > 10 || dy > 10) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        }
+
+        function handleTouchEnd(e, index) {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            
+            if (isLongPressTriggered) {
+                e.preventDefault();
+                isLongPressTriggered = false;
+                return;
+            }
+
+            // 이미 선택 모드인 경우 단발 클릭으로 토글
+            if (selectedProductIndices.size > 0) {
+                if (e.target.closest('.product-actions') || e.target.closest('.action-btn')) {
+                    return;
+                }
+                e.preventDefault();
+                toggleProductSelection(index, !selectedProductIndices.has(index));
+                renderProductsList();
             }
         }
 
