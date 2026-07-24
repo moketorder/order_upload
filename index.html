@@ -3,705 +3,511 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MOKET | 모바일 상품 관리자</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <title>MOKET 배달기사 전용</title>
+    <!-- Pretendard Variable Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <style>
         :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --primary-light: #e6fbf2;
-            --secondary: #6366f1;
-            --secondary-dark: #4f46e5;
-            --secondary-light: #eef2ff;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
+            --bg-color: #f1f5f9;
+            --card-color: #ffffff;
             --text-main: #0f172a;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-            --radius: 16px;
-            --radius-sm: 8px;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --danger: #ef4444;
-            --danger-light: #fef2f2;
+            --text-sub: #475569;
+            --primary: #10b981; /* Moket Green */
+            --primary-hover: #059669;
+            --primary-light: #ecfdf5;
+            --secondary: #ff6d00; /* Nego Orange */
+            --secondary-hover: #e65c00;
+            --secondary-light: #fff3e0;
+            --blue: #3b82f6;
+            --blue-light: #eff6ff;
+            --red: #ef4444;
+            --red-light: #fef2f2;
+            --border: #cbd5e1;
+            --radius-main: 16px;
+            --radius-sub: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg);
+            background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 30px;
+            padding-bottom: 50px;
         }
 
-        /* 헤더 스타일 */
-        header {
-            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
-            color: white;
-            padding: 20px 16px;
-            text-align: center;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
-            box-shadow: var(--shadow);
+        /* 텍스트 입력 영역을 가리킬 때 마우스 포인터(I-beam) 가시성 개선 (검은색 텍스트 커서 적용) */
+        @media (pointer: fine) {
+            input[type="text"], 
+            input[type="number"], 
+            input[type="search"], 
+            input[type="tel"], 
+            textarea {
+                cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDE2IDI0Ij48cGF0aCBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMS42IiBkPSJNNCwyIEwxMiwyIE04LDIgTDgsMjIgTTQsMjIgTDEyLDIyIi8+PC9zdmc+") 8 12, text !important;
+            }
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
-        header h1 {
-            font-size: 20px;
-            font-weight: 800;
+        .header h1 {
+            font-size: 18px;
+            font-weight: 855;
+            color: var(--text-main);
             letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
-        header p {
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-size: 12px;
-            color: #9ca3af;
-            margin-top: 4px;
-        }
-
-        /* 컨테이너 */
-        .container {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 16px;
-            flex: 1;
-        }
-
-        /* 탭 가이드 */
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: #e2e8f0;
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 10px;
-            font-size: 14px;
-            font-weight: 700;
             color: var(--text-sub);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .tab-btn.active {
-            background: var(--card-bg);
-            color: var(--text-main);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        /* 섹션 컨텐츠 */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 카드 컨테이너 */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
-        }
-
-        .card-title {
-            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border-left: 4px solid var(--primary);
-            padding-left: 8px;
-        }
-
-        /* 폼 요소 스타일 */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .form-control, select, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            outline: none;
-            background-color: #f8fafc;
-            transition: var(--transition);
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: none;
-        }
-
-        .form-control:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-        }
-
-        /* 탭 버튼 그룹 (대분류) */
-        .segment-control {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
             background: #f1f5f9;
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
         }
 
-        .segment-control.five-cols {
-            grid-template-columns: repeat(5, 1fr);
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
         }
 
-        /* 하위 탭 스타일 */
-        .sub-tabs-container {
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* 날짜 필터 탭 */
+        .date-tabs-container {
             display: flex;
             gap: 6px;
             overflow-x: auto;
-            padding: 6px;
-            margin-bottom: 12px;
-            background: #f1f5f9;
-            border-radius: var(--radius-sm);
+            white-space: nowrap;
+            padding: 4px 0 10px 0;
+            scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
-
-        .sub-tabs-container::-webkit-scrollbar {
+        .date-tabs-container::-webkit-scrollbar {
             display: none;
         }
-
-        .sub-tab-btn {
+        .date-tab-btn {
             flex-shrink: 0;
-            background: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: #cbd5e1;
+            color: var(--text-sub);
             border: none;
-            padding: 6px 12px;
+            font-weight: 800;
             font-size: 13px;
-            font-weight: 700;
-            color: var(--text-sub);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .sub-tab-btn.active {
-            background: var(--secondary);
-            color: white;
-            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
-        }
-
-        .segment-btn {
-            background: none;
-            border: none;
-            padding: 8px 4px;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-sub);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .segment-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
-        }
-
-        /* 가격 퀵 버튼 그룹 */
-        .quick-price-group {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin-top: 6px;
-        }
-
-        .quick-btn {
-            background: #f1f5f9;
-            border: none;
-            padding: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-sub);
-            border-radius: 6px;
             cursor: pointer;
             transition: var(--transition);
         }
-
-        .quick-btn:hover {
-            background: #e2e8f0;
-            color: var(--text-main);
+        .date-tab-btn.active {
+            background: var(--text-main);
+            color: #ffffff;
         }
 
-        /* 재고 토글 그룹 */
-        .stock-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        /* 검색창 */
+        .search-card {
+            background: var(--card-color);
+            border-radius: var(--radius-main);
+            padding: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid #cbd5e1;
+            margin-bottom: 12px;
         }
-
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        /* 사진 프리뷰 박스 */
-        .image-upload-box {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius-sm);
-            padding: 20px;
-            text-align: center;
-            background: #f8fafc;
-            cursor: pointer;
+        .search-input-wrapper {
             position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 36px 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: var(--radius-sub);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
             transition: var(--transition);
         }
-
-        .image-upload-box:hover {
+        .search-input:focus {
             border-color: var(--primary);
         }
-
-        .image-preview {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: var(--radius-sm);
-            display: none;
-            margin: 10px auto 0;
-            object-fit: cover;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .upload-icon {
-            font-size: 32px;
-            color: var(--text-sub);
-            margin-bottom: 6px;
-        }
-
-        /* 버튼 */
-        .btn-submit {
-            width: 100%;
-            background: var(--primary);
-            color: white;
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
             border: none;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: 700;
-            border-radius: var(--radius-sm);
+            font-size: 18px;
+            color: var(--text-sub);
             cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-            margin-top: 10px;
-            display: flex;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: none;
             align-items: center;
             justify-content: center;
-            gap: 8px;
         }
 
-        .btn-submit:active {
-            transform: scale(0.98);
-        }
-
-        .btn-submit.edit-mode {
-            background: var(--secondary);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-        }
-
-        .btn-cancel {
-            width: 100%;
-            background: #f1f5f9;
-            color: var(--text-sub);
-            border: none;
-            padding: 10px;
+        /* 선택 영역 */
+        .section-title {
             font-size: 13px;
-            font-weight: 600;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            margin-top: 8px;
-            transition: var(--transition);
-            display: none;
-        }
-
-        /* 상품 목록 카드 */
-        .product-item {
+            font-weight: 800;
+            color: var(--text-sub);
+            margin: 10px 0 6px 4px;
             display: flex;
-            gap: 12px;
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            position: relative;
+            align-items: center;
+            gap: 4px;
+        }
+        .selector-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .btn-select {
+            padding: 10px 14px;
+            border-radius: var(--radius-sub);
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1.5px solid #cbd5e1;
+            background: #ffffff;
+            color: var(--text-main);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .btn-select.apt-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+        }
+        .btn-select.dong-btn.active {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(255, 109, 0, 0.25);
         }
 
-        .product-item:last-child {
-            border-bottom: none;
-        }
-
-        .product-item.selected {
-            background-color: #eff6ff !important;
-            box-shadow: inset 0 0 0 2px var(--primary);
-        }
-
-        .product-img {
-            width: 70px;
-            height: 70px;
-            border-radius: var(--radius-sm);
-            object-fit: cover;
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .product-info {
-            flex: 1;
+        /* 공동현관 비번 입력란 */
+        .password-card {
+            background: #fffbeb;
+            border: 1.5px dashed #fcd34d;
+            border-radius: var(--radius-main);
+            padding: 14px;
+            margin-bottom: 14px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+        .password-header {
+            font-size: 14px;
+            font-weight: 850;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .password-body {
+            display: flex;
+            gap: 8px;
+        }
+        .password-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid #fde68a;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+            background: #ffffff;
+            color: #78350f;
+        }
+        .btn-pwd-save {
+            background: #d97706;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-pwd-save:hover {
+            background: #b45309;
         }
 
-        .product-name {
+        /* 배달 목록 카드 */
+        .rider-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .rider-card {
+            background: var(--card-color);
+            border-radius: var(--radius-main);
+            border: 1.5px solid #cbd5e1;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .rider-card.completed {
+            opacity: 0.65;
+            background: #f8fafc;
+        }
+        .rider-card-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfd;
+        }
+        .rider-card.completed .rider-card-header {
+            background: #e2e8f0;
+        }
+        .unit-number {
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+        .customer-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-sub);
+        }
+        .rider-card-body {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .address-text {
             font-size: 14px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 2px;
+            line-height: 1.4;
         }
-
-        .product-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 750;
-            margin-bottom: 4px;
-            width: fit-content;
-        }
-
-        .badge-reserve { background: var(--secondary-light); color: var(--secondary-dark); }
-        .badge-onsite { background: var(--primary-light); color: var(--primary-dark); }
-        .badge-fruit { background: #fffbeb; color: #b45309; }
-        .badge-costco { background: #f1f5f9; color: #475569; }
-
-        .product-price-stock {
+        .address-box {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 8px 10px;
             font-size: 12px;
             font-weight: 600;
             color: var(--text-sub);
         }
-
-        .product-price-stock strong {
-            color: var(--text-main);
-        }
-
-        .product-actions {
+        .item-list {
             display: flex;
-            gap: 8px;
-            margin-top: 6px;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 10px;
         }
-
-        .action-btn {
-            border: none;
-            padding: 4px 8px;
-            font-size: 11px;
+        .item-row {
+            font-size: 13px;
             font-weight: 700;
-            border-radius: 4px;
+            color: #1e293b;
+            display: flex;
+            justify-content: space-between;
+        }
+        .item-qty {
+            color: var(--secondary);
+            font-weight: 850;
+        }
+        
+        /* 카드 하단 액션 바 */
+        .rider-card-footer {
+            padding: 12px 16px;
+            background: #fafbfd;
+            border-top: 1px solid #cbd5e1;
+            display: flex;
+            gap: 6px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            text-align: center;
             cursor: pointer;
             transition: var(--transition);
+            border: 1px solid #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
-
-        .action-edit {
-            background: var(--secondary-light);
-            color: var(--secondary-dark);
+        .btn-call {
+            background: #ffffff;
+            color: var(--blue);
+            border-color: rgba(59, 130, 246, 0.25);
         }
-
-        .action-delete {
-            background: var(--danger-light);
-            color: var(--danger);
+        .btn-sms {
+            background: #ffffff;
+            color: var(--text-sub);
+            border-color: #cbd5e1;
+        }
+        .btn-complete {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            flex: 2;
+        }
+        .btn-complete:hover {
+            background: var(--primary-hover);
+        }
+        .btn-photo {
+            background: #0284c7;
+            color: #ffffff;
+            border: none;
+            flex: 1.5;
+        }
+        .btn-photo:hover {
+            background: #0369a1;
+        }
+        .rider-card.completed .btn-complete,
+        .rider-card.completed .btn-photo {
+            background: #94a3b8;
+            cursor: default;
+        }
+        
+        /* 배달 완료 사진 썸네일 */
+        .photo-thumbnail-container {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .photo-thumbnail {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            cursor: pointer;
         }
 
         /* 로더 오버레이 */
         .loader-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            z-index: 1000;
-            color: white;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-            margin-bottom: 16px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: -0.2px;
-        }
-
-        /* 토스트 */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-            opacity: 0;
-            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        /* 일괄 처리 바 (하단 슬라이드 업 바) */
-        .batch-action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%) translateY(100%);
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(16px);
-            border-top: 1px solid var(--border);
-            border-radius: 20px 20px 0 0;
-            padding: 16px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.12);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 2000;
-            box-sizing: border-box;
-        }
-
-        .batch-action-bar.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .batch-top-row {
-            display: flex;
-            justify-content: space-between;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
             align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 15px;
         }
-
-        .batch-selection-info {
-            font-size: 13px;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader-text {
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-main);
         }
 
-        .batch-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+        /* 토스트 메시지 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-main);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            z-index: 10000;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
-        .btn-batch {
-            flex: 1;
-            min-width: 100px;
-            padding: 10px 16px;
-            border: 1.5px solid var(--border);
-            background: white;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
+        /* 사진상세 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            transition: var(--transition);
         }
-
-        .btn-batch:hover {
-            border-color: var(--text-main);
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-
-        .btn-batch.type-show { border-color: var(--primary); color: var(--primary); }
-        .btn-batch.type-show:hover { background: var(--primary-light); }
-
-        .btn-batch.type-hide { border-color: var(--red); color: var(--red); }
-        .btn-batch.type-hide:hover { background: var(--red-light); }
+        .modal-close {
+            position: absolute;
+            right: 16px;
+            top: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-
-    <header>
-        <h1>📦 MOKET 상품 업로더</h1>
-        <p>주문서 앱에 들어갈 상품을 스마트폰으로 빠르게 등록하세요.</p>
-    </header>
-
-    <div class="container">
-        <!-- 탭 구조 -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('upload')">✍️ 상품 등록</button>
-            <button class="tab-btn" onclick="switchTab('manage')">📋 상품 목록 (<span id="product-count">0</span>)</button>
-        </div>
-
-        <!-- 탭 1: 상품 등록 -->
-        <div id="tab-upload" class="tab-content active">
-            <div class="card">
-                <div class="card-title" id="form-card-title">✨ 신규 상품 등록</div>
-                
-                <form id="productForm" onsubmit="submitForm(event)">
-                    <!-- 대분류 세그먼트 -->
-                    <div class="form-group">
-                        <label>대분류 탭</label>
-                        <div class="segment-control">
-                            <div class="segment-btn active" data-tab="fruit" onclick="selectMainTab('fruit')">과일/야채</div>
-                            <div class="segment-btn" data-tab="reserve" onclick="selectMainTab('reserve')">공동구매</div>
-                            <div class="segment-btn" data-tab="onsite" onclick="selectMainTab('onsite')">상시판매</div>
-                            <div class="segment-btn" data-tab="costco" onclick="selectMainTab('costco')">코스트코</div>
-                        </div>
-                    </div>
-
-                    <!-- 상세 분류 (대분류에 따라 동적으로 구성됨) -->
-                    <div class="form-group" id="categoryGroup">
-                        <label id="categoryLabel">카테고리 / 날짜</label>
-                        <!-- 동적으로 input 또는 select 태그가 위치함 -->
-                        <div id="categoryContainer"></div>
-                    </div>
-
-                    <!-- 상품명 -->
-                    <div class="form-group">
-                        <label>상품명</label>
-                        <input type="text" id="productName" class="form-control" placeholder="예: 무농약 프리미엄 딸기 1kg" required>
-                    </div>
-
-                    <!-- 가격 -->
-                    <div class="form-group">
-                        <label>가격 (원)</label>
-                        <input type="number" id="productPrice" class="form-control" placeholder="예: 15000" min="0" required>
-                    </div>
-
-                    <!-- 재고 수량 -->
-                    <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <label style="margin-bottom: 0;">주문 가능 재고량</label>
-                            <div class="switch-container" onclick="toggleUnlimitedStock()">
-                                <input type="checkbox" id="unlimitedStock" style="cursor: pointer;">
-                                <span style="font-size: 12px; font-weight: 700; color: var(--text-sub);">무제한</span>
-                            </div>
-                        </div>
-                        <input type="number" id="productStock" class="form-control" placeholder="예: 50" min="0" required>
-                    </div>
-
-                    <!-- 상세 설명 -->
-                    <div class="form-group">
-                        <label>상세설명</label>
-                        <textarea id="productDesc" rows="3" placeholder="상품에 대한 맛, 크기, 원산지 등의 상세 설명을 입력하세요..." oninput="autoResizeTextarea(this)"></textarea>
-                    </div>
-
-                    <!-- 이미지 첨부 -->
-                    <div class="form-group">
-                        <label>상품 이미지</label>
-                        <div class="image-upload-box" onclick="triggerFileInput()">
-                            <div class="upload-icon">📸</div>
-                            <div style="font-size: 13px; font-weight: 600; color: var(--text-sub);">사진 촬영 또는 파일 선택 (여러 장 가능)</div>
-                            <input type="file" id="imageFile" accept="image/*" multiple style="display: none;" onchange="handleFileSelection(event)">
-                        </div>
-                        <!-- 선택된 파일 목록 및 대표이미지 지정 영역 -->
-                        <div id="imageListContainer" style="margin-top: 12px; display: none;">
-                            <label style="font-size: 12px; color: var(--text-sub); font-weight: bold; margin-bottom: 6px; display: block;">선택된 사진 파일 (대표 섬네일 선택):</label>
-                            <div id="selectedFilesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-submit" id="submitBtn">🚀 상품 등록 완료</button>
-                    <button type="button" class="btn-cancel" id="cancelBtn" onclick="exitEditMode()">수정 취소</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 탭 2: 상품 목록 관리 -->
-        <div id="tab-manage" class="tab-content">
-            <!-- 상품 목록 대분류 필터 탭 -->
-            <div class="segment-control five-cols" style="margin-bottom: 12px;">
-                <div class="segment-btn active" data-manage-tab="all" onclick="selectManageTab('all')">전체</div>
-                <div class="segment-btn" data-manage-tab="fruit" onclick="selectManageTab('fruit')">과일/야채</div>
-                <div class="segment-btn" data-manage-tab="reserve" onclick="selectManageTab('reserve')">공동구매</div>
-                <div class="segment-btn" data-manage-tab="onsite" onclick="selectManageTab('onsite')">상시판매</div>
-                <div class="segment-btn" data-manage-tab="costco" onclick="selectManageTab('costco')">코스트코</div>
-            </div>
-            <!-- 상품 목록 소분류 하위 탭 -->
-            <div id="sub-products-list-tabs" class="sub-tabs-container" style="display: none; margin-bottom: 12px;"></div>
-            <div class="card" style="padding: 10px;">
-                <div id="products-list-container">
-                    <!-- 상품 목록이 비어있을 때 임시 상태 -->
-                    <div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">
-                        상품 목록을 불러오는 중입니다...
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- 로더 오버레이 -->
     <div class="loader-overlay" id="loader">
         <div class="spinner"></div>
@@ -711,1095 +517,711 @@
     <!-- 토스트 메시지 -->
     <div class="toast" id="toast"></div>
 
-    <!-- 일괄 처리 툴바 -->
-    <div class="batch-action-bar no-print">
-        <div class="batch-top-row">
-            <div class="batch-selection-info">
-                <span id="selection-count-text">0개 상품 선택됨</span>
-            </div>
-        </div>
-        <div class="batch-buttons">
-            <button class="btn-batch type-show" onclick="handleBatchVisibility(true)">👁️ 노출</button>
-            <button class="btn-batch type-hide" onclick="handleBatchVisibility(false)">🙈 숨김</button>
+    <!-- 헤더 -->
+    <div class="header">
+        <h1>MOKET 배달배송</h1>
+        <div class="sync-status">
+            <span class="sync-dot"></span>
+            <span id="sync-time-text">대기 중</span>
         </div>
     </div>
 
+    <div class="container">
+        <!-- 날짜 필터 탭 -->
+        <div class="date-tabs-container" id="date-tabs">
+            <!-- 동적 로드 -->
+        </div>
+
+        <!-- 검색창 -->
+        <div class="search-card">
+            <div class="search-input-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="고객명, 연락처, 호수, 상품명 검색..." onkeyup="handleSearchInput()">
+                <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()">&times;</button>
+            </div>
+        </div>
+
+        <!-- 아파트 선택 버튼 그룹 -->
+        <div class="section-title">🏢 아파트 단지 선택</div>
+        <div class="selector-group" id="apartment-buttons">
+            <!-- 동적 로드 -->
+        </div>
+
+        <!-- 동 선택 버튼 그룹 -->
+        <div id="dong-section" style="display: none;">
+            <div class="section-title">🚪 동 선택</div>
+            <div class="selector-group" id="dong-buttons">
+                <!-- 동적 로드 -->
+            </div>
+        </div>
+
+        <!-- 주문 목록 영역 -->
+        <div class="rider-list-container" id="order-list">
+            <div style="text-align:center; padding:50px; font-weight:800; color:var(--text-sub); font-size: 14px;">
+                아파트 단지를 먼저 선택해 주세요.
+            </div>
+        </div>
+    </div>
+
+    <!-- 사진 상세 모달 -->
+    <div id="photo-modal" class="modal" onclick="closePhotoModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closePhotoModal()">&times;</span>
+            <h3 style="margin-top: 0; font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 15px;">📸 배달 완료 사진</h3>
+            <img id="photo-modal-img" src="" style="width: 100%; max-height: 450px; object-fit: contain; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #f8fafc;">
+        </div>
+    </div>
+
+    <!-- 숨겨진 파일 카메라 업로드용 인풋 -->
+    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="handleDeliveryPhotoUpload(event)">
+
     <script>
-        // 상수 정의
         const FIREBASE_DB_URL = "https://moketdb-default-rtdb.asia-southeast1.firebasedatabase.app/";
-        const API_URL = "https://script.google.com/macros/s/AKfycbw6F-D5UhJTkLafBv4uOs5_lUD61ervXveLCcZ6ROHNYhFbEi_vJUamKHUjHE9wGeaY/exec";
 
-        // 상태 변수
-        let currentTab = "reserve"; // reserve, onsite, fruit, costco
-        let products = [];
-        let isEditMode = false;
-        let editProductKey = null; // 수정 시 사용할 상품 인덱스/식별자
-        let selectedDate = new Date().toISOString().split('T')[0];
-        let currentManageTab = "all"; // all, fruit, reserve, onsite, costco
-        let currentSubTab = "all"; // all, YYYY-MM-DD (공동구매 날짜), 냉동/냉장/상온 (상시판매)
+        let rawOrders = [];
+        let entrancePasswords = {}; // 공동현관 비밀번호 로컬 캐시
+
+        let currentYear = "";
+        let currentMonth = "";
+        let currentDay = "";
         
-        // 다중 파일 및 섬네일 상태 변수
-        let selectedFiles = []; // { file: File, id: null, isExisting: false, displayName: '...' }
-        let thumbnailIndex = -1;
-        let globalAdjustments = {};
-        let selectedProductIndices = new Set();
+        let activeApartment = ""; // 선택된 아파트
+        let activeDong = ""; // 선택된 동
 
-        function fSafeKey(s) {
-            return String(s || "").replace(/[\.\-\$#\[\]\/]/g, "_").trim();
-        }
-        function fGetAdjKey(mKey, name) {
-            const s = String(mKey || "").trim();
-            return fSafeKey(s) + "_" + fSafeKey(name);
-        }
+        let activeUploadPhone = ""; // 사진 업로드 타겟 주문
+        let activeUploadKey = "";
 
-        // 상품 목록 탭 대분류 선택 핸들러
-        function selectManageTab(tab) {
-            currentManageTab = tab;
-            currentSubTab = "all";
-            document.querySelectorAll('[data-manage-tab]').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.manageTab === tab);
-            });
-            selectedProductIndices.clear();
-            updateBatchBar();
-            buildSubTabs();
-            renderProductsList();
-        }
-
-        // 상품 목록 소분류 하위 탭 선택 핸들러
-        function selectManageSubTab(subTab) {
-            currentSubTab = subTab;
-            document.querySelectorAll('.sub-tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.subTab === subTab);
-            });
-            selectedProductIndices.clear();
-            updateBatchBar();
-            renderProductsList();
-        }
-
-        // textarea 높이 자동 조절 함수
-        function autoResizeTextarea(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-        }
-
-        // 하위 탭 동적 빌드 함수
-        function buildSubTabs() {
-            const subContainer = document.getElementById('sub-products-list-tabs');
-            subContainer.innerHTML = '';
-            
-            if (currentManageTab === 'reserve') {
-                // 공동구매 상품 중 고유한 날짜(date) 목록 추출
-                const dates = [];
-                products.forEach(prod => {
-                    const mKey = prod.matchKey || "";
-                    let tabType = "reserve";
-                    if (mKey.includes("냉동") || mKey.includes("냉장") || mKey.includes("상온") || mKey.includes("실온") || mKey.includes("상시판매") || mKey.includes("현장판매")) {
-                        tabType = "onsite";
-                    } else if (mKey.includes("예약") && (mKey.includes("과일") || mKey.includes("야채") || mKey.includes("기타"))) {
-                        tabType = "fruit";
-                    } else if (mKey.includes("코스트코")) {
-                        tabType = "costco";
-                    }
-                    
-                    if (tabType === 'reserve' && prod.date) {
-                        if (!dates.includes(prod.date)) {
-                            dates.push(prod.date);
+        // 이미지 최적화 및 압축
+        function resizeAndCompressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const max_width = 800;
+                        if (width > max_width) {
+                            height = Math.round((height * max_width) / width);
+                            width = max_width;
                         }
-                    }
-                });
-                
-                // 날짜 최신순 (내림차순) 정렬
-                dates.sort((a, b) => b.localeCompare(a));
-                
-                if (dates.length > 0) {
-                    subContainer.style.display = 'flex';
-                    
-                    // "전체" 탭 추가
-                    const allBtn = document.createElement('button');
-                    allBtn.type = 'button';
-                    allBtn.className = 'sub-tab-btn active';
-                    allBtn.dataset.subTab = 'all';
-                    allBtn.innerText = '전체';
-                    allBtn.onclick = () => selectManageSubTab('all');
-                    subContainer.appendChild(allBtn);
-                    
-                    // 날짜 탭 추가
-                    dates.forEach(date => {
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'sub-tab-btn';
-                        btn.dataset.subTab = date;
-                        
-                        // 날짜가 YYYY-MM-DD 형식일 경우 MM/DD (요일) 형식으로 예쁘게 변환
-                        let displayDate = date;
-                        if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-                            const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-                            const parts = date.split('-');
-                            const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                            if (!isNaN(d.getTime())) {
-                                displayDate = `${parseInt(parts[1])}/${parseInt(parts[2])} (${daysOfWeek[d.getDay()]})`;
-                            } else {
-                                displayDate = `${parseInt(parts[1])}/${parseInt(parts[2])}`;
-                            }
-                        }
-                        btn.innerText = displayDate;
-                        btn.onclick = () => selectManageSubTab(date);
-                        subContainer.appendChild(btn);
-                    });
-                } else {
-                    subContainer.style.display = 'none';
-                }
-            } 
-            else if (currentManageTab === 'onsite') {
-                subContainer.style.display = 'flex';
-                
-                const categories = ['all', '냉동', '냉장', '상온'];
-                categories.forEach(cat => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'sub-tab-btn' + (cat === 'all' ? ' active' : '');
-                    btn.dataset.subTab = cat;
-                    btn.innerText = cat === 'all' ? '전체' : (cat === '냉동' ? '🧊냉동' : cat === '냉장' ? '❄️냉장' : cat === '상온' ? '🌡️상온' : cat);
-                    btn.onclick = () => selectManageSubTab(cat);
-                    subContainer.appendChild(btn);
-                });
-            } 
-            else {
-                subContainer.style.display = 'none';
-            }
-        }
-
-        // 탭별 카테고리 구성 정의
-        const onsiteCategories = ["냉동", "냉장", "상온"];
-        const fruitCategories = [
-            { key: "과일_예약", label: "과일" },
-            { key: "야채_예약", label: "야채" },
-            { key: "기타_예약", label: "기타" }
-        ];
-        const costcoCategories = ["코스트코 냉동", "코스트코 냉장", "코스트코 상온"];
-
-        // 페이지 로딩 완료 시 실행
-        window.addEventListener('DOMContentLoaded', () => {
-            // 대분류 탭에 맞춰 카테고리 초기화
-            selectMainTab('fruit');
-            
-            // Firebase 상품 데이터 가져오기
-            fetchProducts();
-        });
-
-        // 탭 전환 (등록 / 관리)
-        function switchTab(target) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            selectedProductIndices.clear();
-            updateBatchBar();
-
-            if (target === 'upload') {
-                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-                document.getElementById('tab-upload').classList.add('active');
-            } else {
-                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
-                document.getElementById('tab-manage').classList.add('active');
-                renderProductsList();
-            }
-        }
-
-        // 대분류 탭 선택 핸들러
-        function selectMainTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.segment-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tab);
-            });
-
-            const container = document.getElementById('categoryContainer');
-            container.innerHTML = '';
-
-            const today = new Date().toISOString().split('T')[0];
-
-            if (tab === 'reserve') {
-                // 공동구매/예약: 캘린더를 통해 예약 수령일을 선택하게 하거나, 수동 입력
-                document.getElementById('categoryLabel').innerText = "공동구매 날짜 선택";
-                const input = document.createElement('input');
-                input.type = 'date';
-                input.id = 'categoryValue';
-                input.className = 'form-control';
-                input.value = selectedDate;
-                input.onchange = () => {
-                    selectedDate = input.value;
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
                 };
-                container.appendChild(input);
-            } 
-            else if (tab === 'onsite') {
-                // 현장 판매: 냉동/냉장/상온 등 분류 선택
-                document.getElementById('categoryLabel').innerText = "보관/분류 카테고리";
-                const select = document.createElement('select');
-                select.id = 'categoryValue';
-                onsiteCategories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat;
-                    opt.innerText = (cat === "냉동" ? "🧊냉동" : cat === "냉장" ? "❄️냉장" : cat === "상온" ? "🌡️상온" : cat);
-                    select.appendChild(opt);
-                });
-                container.appendChild(select);
-            } 
-            else if (tab === 'fruit') {
-                // 과일/야채: 전용 예약 탭 키워드
-                document.getElementById('categoryLabel').innerText = "과채류 분류 선택";
-                const select = document.createElement('select');
-                select.id = 'categoryValue';
-                fruitCategories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat.key;
-                    opt.innerText = cat.label;
-                    select.appendChild(opt);
-                });
-                container.appendChild(select);
-            } 
-            else if (tab === 'costco') {
-                // 코스트코: 코스트코 소분류 선택
-                document.getElementById('categoryLabel').innerText = "코스트코 소분류 선택";
-                const select = document.createElement('select');
-                select.id = 'categoryValue';
-                costcoCategories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat;
-                    opt.innerText = cat;
-                    select.appendChild(opt);
-                });
-                container.appendChild(select);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 아파트 이름 추출 헬퍼
+        function extractApartmentName(address) {
+            if (!address) return "";
+            const normalized = String(address).replace(/\s+/g, "");
+            
+            if (normalized.includes("선동433")) return "푸르지오";
+            if (normalized.includes("선동436")) return "더샵";
+            if (normalized.includes("선동427")) return "자이";
+            if (normalized.includes("선동430")) return "리버뷰자이";
+            if (normalized.includes("선동434")) return "베라체";
+            if (normalized.includes("선동435")) return "리버나인";
+            if (normalized.includes("선동432")) return "칸타빌";
+            if (normalized.includes("망월동1100")) return "골든센트로";
+            if (normalized.includes("망월동1110")) return "부영";
+            if (normalized.includes("망월동1090")) return "센트럴포레";
+            
+            const keywords = [
+                "푸르지오", "더샵", "자이", "베라체", "리버나인", "칸타빌", "골든센트로", "부영", "센트럴포레",
+                "아데나", "신안인스빌", "동원", "호반", "루나리움", "힐스테이트", "디에트르", "아이파크",
+                "e편한", "이편한", "리버뷰자이", "센트럴자이", "리버포레", "롯데캐슬", "스타힐스", "서희스타힐스",
+                "센트리버"
+            ];
+            
+            for (const keyword of keywords) {
+                if (normalized.includes(keyword)) {
+                    if (keyword === "이편한" || keyword === "e편한") return "e편한세상";
+                    return keyword;
+                }
+            }
+            return "기타";
+        }
+
+        // 동 번호(숫자) 추출 헬퍼
+        function getDongNumber(addressDetail, address) {
+            const fullAddr = `${address || ''} ${addressDetail || ''}`;
+            let match = fullAddr.match(/([0-9]+)\s*동/);
+            if (match) return match[1];
+            match = fullAddr.match(/([0-9]+)\s*-\s*[0-9]+/);
+            if (match) return match[1];
+            match = fullAddr.match(/\b([0-9]+)\b/);
+            if (match) return match[1];
+            return "";
+        }
+
+        // 끝에 1동 만 포맷 헬퍼 (예: 101동 -> 1동)
+        function formatDongName(dongRaw) {
+            const match = String(dongRaw).match(/(\d+)/);
+            if (match) {
+                const numStr = match[1];
+                const lastDigit = numStr.slice(-1);
+                return lastDigit + "동";
+            }
+            return dongRaw || "기타";
+        }
+
+        // 날짜/시간 비교를 위한 문자열 파싱 헬퍼
+        function parseTimestampToDate(ts) {
+            if (!ts) return new Date(0);
+            const tsStr = String(ts);
+            let match = tsStr.match(/(\d+)년\s*(\d+)월\s*(\d+)일.*?(\d+):(\d+):(\d+)/);
+            if (match) {
+                return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]), parseInt(match[4]), parseInt(match[5]), parseInt(match[6]));
+            }
+            match = tsStr.match(/(\d+)년\s*(\d+)월\s*(\d+)일/);
+            if (match) {
+                return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+            }
+            match = tsStr.match(/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/);
+            if (match) {
+                return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]), parseInt(match[4]), parseInt(match[5]), parseInt(match[6]));
+            }
+            match = tsStr.match(/(\d+)-(\d+)-(\d+)/);
+            if (match) {
+                return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+            }
+            return new Date(tsStr);
+        }
+
+        function getOrderDateInfo(item) {
+            let dateStr = String(item.pickupDate || "").trim();
+            const hasValidDateFormat = /(\d+)년\s*(\d+)월\s*(\d+)일|(\d+)-(\d+)-(\d+)/.test(dateStr);
+            if (!hasValidDateFormat || dateStr === "") {
+                if (item.timestamp) {
+                    dateStr = String(item.timestamp).trim();
+                }
+            }
+            let match = dateStr.match(/(\d+)년\s*(\d+)월\s*(\d+)일/);
+            if (match) {
+                const m = parseInt(match[2]) + "월";
+                const d = parseInt(match[3]) + "일";
+                let year = match[1];
+                if (year.length === 2) year = "20" + year;
+                return { month: m, day: d, dateStr: `${year}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}` };
+            }
+            match = dateStr.match(/(\d+)-(\d+)-(\d+)/);
+            if (match) {
+                const m = parseInt(match[2]) + "월";
+                const d = parseInt(match[3]) + "일";
+                let year = match[1];
+                if (year.length === 2) year = "20" + year;
+                return { month: m, day: d, dateStr: `${year}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}` };
+            }
+            return { month: "기타", day: "기타", dateStr: "기타" };
+        }
+
+        // DB에서 데이터 로드
+        async function loadData() {
+            showLoader("데이터 로딩 중...");
+            try {
+                const [response, pwdRes] = await Promise.all([
+                    fetch(`${FIREBASE_DB_URL}orders.json?t=${Date.now()}`),
+                    fetch(`${FIREBASE_DB_URL}entrance_passwords.json?t=${Date.now()}`).catch(e => null)
+                ]);
+                
+                if (!response.ok) throw new Error("Firebase 연결 실패");
+                const data = await response.json() || {};
+
+                if (pwdRes && pwdRes.ok) {
+                    entrancePasswords = await pwdRes.json() || {};
+                } else {
+                    entrancePasswords = {};
+                }
+
+                rawOrders = [];
+                for (const phone in data) {
+                    for (const orderKey in data[phone]) {
+                        const it = data[phone][orderKey];
+                        
+                        const isCanceled = (it.canceled === true || it.canceled === "true" || String(it.canceled).toUpperCase() === "TRUE");
+                        if (isCanceled) continue; // 취소 건 제외
+
+                        // 배달 주문만 필터링 (수령방법이 배달주문이거나, 수령방법이 매장픽업이 아닌데 주소가 써있을 때)
+                        const isDelivery = (it.shippingMethod === '배달주문' || (it.shippingMethod !== '매장픽업' && it.address && String(it.address).trim() !== ""));
+                        if (!isDelivery) continue;
+
+                        const isDelivered = (it.delivered === true || it.delivered === "true" || String(it.delivered).toUpperCase() === "TRUE");
+                        const isStocked = (it.isStocked === true || it.isStocked === "true" || String(it.isStocked).toUpperCase() === "TRUE");
+
+                        let calculatedStatus = "대기";
+                        if (isDelivered) calculatedStatus = "배달완료";
+                        else if (isStocked) calculatedStatus = "입고";
+
+                        rawOrders.push({
+                            phone,
+                            orderKey,
+                            ...it,
+                            status: calculatedStatus
+                        });
+                    }
+                }
+
+                // 타임스탬프 기준 내림차순 정렬
+                rawOrders.sort((a, b) => parseTimestampToDate(b.timestamp) - parseTimestampToDate(a.timestamp));
+
+                const now = new Date();
+                document.getElementById('sync-time-text').innerText = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 동기화됨`;
+
+                buildDateTabs();
+            } catch (e) {
+                console.error(e);
+                showToast("데이터를 로드하지 못했습니다.");
+            } finally {
+                hideLoader();
             }
         }
 
+        // 날짜 탭 구축
+        function buildDateTabs() {
+            const dateContainer = document.getElementById('date-tabs');
+            dateContainer.innerHTML = '';
 
-        // 재고 무제한 전환
-        function toggleUnlimitedStock() {
-            const isUnlimited = document.getElementById('unlimitedStock').checked;
-            const stockInput = document.getElementById('productStock');
-            if (isUnlimited) {
-                stockInput.value = '9999';
-                stockInput.disabled = true;
-            } else {
-                stockInput.value = '';
-                stockInput.disabled = false;
-                stockInput.focus();
-            }
-        }
+            const dateSet = new Set();
+            rawOrders.forEach(item => {
+                const info = getOrderDateInfo(item);
+                if (info.dateStr && info.dateStr !== "기타") {
+                    dateSet.add(info.dateStr);
+                }
+            });
 
-        // 이미지 파일 브라우저 트리거
-        function triggerFileInput() {
-            document.getElementById('imageFile').click();
-        }
+            const sortedDates = [...dateSet].sort((a, b) => b.localeCompare(a)); // 최신순
 
-        // 다중 파일 선택 및 렌더링 핸들러
-        function handleFileSelection(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-            
-            for (let i = 0; i < files.length; i++) {
-                selectedFiles.push({
-                    file: files[i],
-                    id: null,
-                    isExisting: false,
-                    displayName: files[i].name
-                });
-            }
-            
-            if (selectedFiles.length > 0 && thumbnailIndex === -1) {
-                thumbnailIndex = 0;
-            }
-            
-            renderSelectedFilesList();
-            event.target.value = '';
-        }
-
-        function renderSelectedFilesList() {
-            const container = document.getElementById('imageListContainer');
-            const list = document.getElementById('selectedFilesList');
-            list.innerHTML = '';
-            
-            if (selectedFiles.length === 0) {
-                container.style.display = 'none';
+            if (sortedDates.length === 0) {
+                dateContainer.innerHTML = '<div style="font-weight:700; color:var(--text-sub); padding:10px;">배달 예약 정보가 없습니다.</div>';
                 return;
             }
-            
-            container.style.display = 'block';
-            
-            selectedFiles.forEach((item, idx) => {
-                const row = document.createElement('div');
-                row.style = "display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1.5px solid var(--border);";
+
+            // 오늘 날짜 기본 활성화 우선
+            const todayStr = new Date().toISOString().split('T')[0];
+            let activeDate = sortedDates.includes(todayStr) ? todayStr : sortedDates[0];
+
+            if (currentYear && currentMonth && currentDay) {
+                const prevActiveDate = `${currentYear}-${currentMonth.replace("월","").padStart(2,'0')}-${currentDay.replace("일","").padStart(2,'0')}`;
+                if (sortedDates.includes(prevActiveDate)) {
+                    activeDate = prevActiveDate;
+                }
+            }
+
+            // 전역 날짜 변수 설정
+            const parts = activeDate.split('-');
+            currentYear = parts[0] + "년";
+            currentMonth = parseInt(parts[1]) + "월";
+            currentDay = parseInt(parts[2]) + "일";
+
+            sortedDates.forEach(dateStr => {
+                const btn = document.createElement('button');
+                btn.className = `date-tab-btn ${dateStr === activeDate ? 'active' : ''}`;
                 
-                const isChecked = (idx === thumbnailIndex);
+                const dParts = dateStr.split('-');
+                btn.innerText = `${parseInt(dParts[1])}/${parseInt(dParts[2])}`;
                 
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                        <input type="radio" name="thumbnailSelect" id="thumb_${idx}" ${isChecked ? 'checked' : ''} onchange="setThumbnail(${idx})" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary);">
-                        <span style="font-size: 13px; font-weight: 600; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; flex: 1;" onclick="setThumbnail(${idx})">
-                            📄 ${item.displayName}
-                        </span>
-                        ${isChecked ? '<span style="color: var(--primary); font-size: 11px; font-weight: 800; background: var(--primary-light); padding: 2px 6px; border-radius: 4px; flex-shrink: 0;">대표 섬네일</span>' : ''}
+                btn.onclick = () => {
+                    const parts = dateStr.split('-');
+                    currentYear = parts[0] + "년";
+                    currentMonth = parseInt(parts[1]) + "월";
+                    currentDay = parseInt(parts[2]) + "일";
+                    
+                    document.querySelectorAll('.date-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // 초기화 후 렌더링
+                    activeApartment = "";
+                    activeDong = "";
+                    renderFilteredData();
+                };
+                dateContainer.appendChild(btn);
+            });
+
+            renderFilteredData();
+        }
+
+        // 필터링 및 아파트/동 구조 렌더링
+        function renderFilteredData() {
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.style.display = search !== "" ? "flex" : "none";
+
+            // 1단계: 선택 날짜 필터링
+            let filtered = rawOrders.filter(item => {
+                const info = getOrderDateInfo(item);
+                const itemYear = info.dateStr && info.dateStr !== "기타" ? (info.dateStr.split('-')[0] + "년") : "기타";
+                return itemYear === currentYear && info.month === currentMonth && info.day === currentDay;
+            });
+
+            // 2단계: 검색어 필터링
+            if (search !== "") {
+                filtered = filtered.filter(item => {
+                    const addressStr = (item.address || "") + " " + (item.addressDetail || "");
+                    const nameStr = item.name || "";
+                    const phoneStr = item.phone || "";
+                    const itemStr = item.item || "";
+                    return addressStr.toLowerCase().includes(search) ||
+                           nameStr.toLowerCase().includes(search) ||
+                           phoneStr.includes(search) ||
+                           itemStr.toLowerCase().includes(search);
+                });
+            }
+
+            // 3단계: 아파트별 그룹화
+            const aptGroups = {};
+            filtered.forEach(item => {
+                const aptName = extractApartmentName(item.address);
+                if (!aptGroups[aptName]) {
+                    aptGroups[aptName] = [];
+                }
+                aptGroups[aptName].push(item);
+            });
+
+            // 아파트 버튼 생성
+            const aptContainer = document.getElementById('apartment-buttons');
+            aptContainer.innerHTML = '';
+
+            const apartments = Object.keys(aptGroups).sort();
+            if (apartments.length === 0) {
+                aptContainer.innerHTML = '<div style="font-size:13px; color:var(--text-sub); font-weight:700; padding:10px;">배달 건이 없습니다.</div>';
+                document.getElementById('dong-section').style.display = 'none';
+                document.getElementById('order-list').innerHTML = '<div style="text-align:center; padding:50px; font-weight:800; color:var(--text-sub);">조건에 일치하는 배달 주문이 없습니다.</div>';
+                return;
+            }
+
+            if (!activeApartment || !apartments.includes(activeApartment)) {
+                activeApartment = apartments[0];
+            }
+
+            apartments.forEach(apt => {
+                const btn = document.createElement('button');
+                btn.className = `btn-select apt-btn ${apt === activeApartment ? 'active' : ''}`;
+                btn.innerText = `${apt} (${aptGroups[apt].length})`;
+                btn.onclick = () => {
+                    activeApartment = apt;
+                    activeDong = ""; // 아파트 변경 시 동 초기화
+                    document.querySelectorAll('.apt-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderDongButtons(aptGroups[apt]);
+                };
+                aptContainer.appendChild(btn);
+            });
+
+            renderDongButtons(aptGroups[activeApartment]);
+        }
+
+        // 동 버튼 생성
+        function renderDongButtons(aptOrders) {
+            const dongContainer = document.getElementById('dong-buttons');
+            dongContainer.innerHTML = '';
+            
+            // 아파트 주문 건 중 동 이름으로 분류
+            const dongGroups = {};
+            aptOrders.forEach(item => {
+                const rawDong = getDongNumber(item.addressDetail, item.address);
+                const dongFormatted = formatDongName(rawDong); // "1동", "2동" 등
+                if (!dongGroups[dongFormatted]) {
+                    dongGroups[dongFormatted] = [];
+                }
+                dongGroups[dongFormatted].push(item);
+            });
+
+            const dongs = Object.keys(dongGroups).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+
+            if (dongs.length === 0) {
+                document.getElementById('dong-section').style.display = 'none';
+                document.getElementById('order-list').innerHTML = '<div style="text-align:center; padding:50px; font-weight:800; color:var(--text-sub);">동 정보 파싱에 실패한 주문만 있거나 배달이 없습니다.</div>';
+                return;
+            }
+
+            document.getElementById('dong-section').style.display = 'block';
+
+            if (!activeDong || !dongs.includes(activeDong)) {
+                activeDong = dongs[0];
+            }
+
+            dongs.forEach(dong => {
+                const btn = document.createElement('button');
+                btn.className = `btn-select dong-btn ${dong === activeDong ? 'active' : ''}`;
+                btn.innerText = `${dong} (${dongGroups[dong].length})`;
+                btn.onclick = () => {
+                    activeDong = dong;
+                    document.querySelectorAll('.dong-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderOrderCards(dongGroups[dong]);
+                };
+                dongContainer.appendChild(btn);
+            });
+
+            renderOrderCards(dongGroups[activeDong]);
+        }
+
+        // 주문 리스트 카드 렌더링
+        function renderOrderCards(dongOrders) {
+            const listContainer = document.getElementById('order-list');
+            listContainer.innerHTML = '';
+
+            // 동별 그룹화된 주문들의 호수 오름차순 정렬
+            const extractHoNum = (item) => {
+                const detail = item.addressDetail || "";
+                const match = detail.match(/([0-9]+)\s*호/);
+                if (match) return parseInt(match[1]);
+                const matchDash = detail.match(/[0-9]+\s*-\s*([0-9]+)/);
+                if (matchDash) return parseInt(matchDash[1]);
+                return 9999;
+            };
+
+            dongOrders.sort((a, b) => extractHoNum(a) - extractHoNum(b));
+
+            // 공동현관 비번 정보 로드
+            const cachedPassword = (entrancePasswords[activeApartment] && entrancePasswords[activeApartment][activeDong]) || "";
+
+            // 첫째줄: 공동현관 비번 입력란 카드 렌더링
+            const pwdCard = document.createElement('div');
+            pwdCard.className = 'password-card';
+            pwdCard.innerHTML = `
+                <div class="password-header">🚪 ${activeApartment} ${activeDong} 공동현관 비번</div>
+                <div class="password-body">
+                    <input type="text" id="entrance-password-input" class="password-input" placeholder="비밀번호(예: 열쇠1234종) 입력..." value="${cachedPassword}">
+                    <button class="btn-pwd-save" onclick="saveEntrancePassword()">저장</button>
+                </div>
+            `;
+            listContainer.appendChild(pwdCard);
+
+            // 주문 카드 목록 생성
+            dongOrders.forEach(item => {
+                const card = document.createElement('div');
+                const isCompleted = item.status === '배달완료';
+                card.className = `rider-card ${isCompleted ? 'completed' : ''}`;
+
+                // 호수 추출
+                let hoLabel = "";
+                const hoNum = extractHoNum(item);
+                if (hoNum !== 9999) {
+                    hoLabel = hoNum + "호";
+                } else {
+                    hoLabel = item.addressDetail || "주소상세";
+                }
+                
+                // 동 원본 번호
+                const rawDong = getDongNumber(item.addressDetail, item.address);
+                const fullDongHo = rawDong ? `${rawDong}동 ${hoLabel}` : hoLabel;
+
+                // 전화번호 포맷 정규화
+                const cleanPhone = String(item.phone || "").replace(/\D/g, "");
+
+                let itemHtml = `
+                    <div class="item-row">
+                        <span>${item.item}</span>
+                        <span class="item-qty">${item.qty}개</span>
                     </div>
-                    <button type="button" onclick="removeSelectedFile(${idx})" style="background: none; border: none; color: var(--danger); font-size: 18px; font-weight: bold; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
                 `;
-                list.appendChild(row);
+
+                card.innerHTML = `
+                    <div class="rider-card-header">
+                        <span class="unit-number">${fullDongHo}</span>
+                        <span class="customer-name">${item.name} 고객님</span>
+                    </div>
+                    <div class="rider-card-body">
+                        <div class="address-text">${item.address} ${item.addressDetail}</div>
+                        ${item.entrance ? `
+                            <div class="address-box" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8;">
+                                🚪 공동현관 입력값: <b>${item.entrance}</b>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="item-list">
+                            ${itemHtml}
+                        </div>
+
+                        ${item.deliveryPhoto ? `
+                            <div class="photo-thumbnail-container">
+                                <span style="font-size:11px; font-weight:800; color:var(--primary);">📸 배달 완료 사진:</span>
+                                <img src="${item.deliveryPhoto}" class="photo-thumbnail" onclick="viewDeliveryPhoto('${item.phone}_${item.orderKey}', '${item.deliveryPhoto}')">
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="rider-card-footer no-print">
+                        <a href="tel:${cleanPhone}" class="btn-action btn-call">📞 전화</a>
+                        <a href="sms:${cleanPhone}" class="btn-action btn-sms">💬 문자</a>
+                        <button class="btn-action btn-photo" onclick="triggerCameraUpload('${item.phone}', '${item.orderKey}')">📸 사진업로드</button>
+                        <button class="btn-action btn-complete" onclick="markAsDelivered('${item.phone}', '${item.orderKey}')">🚚 배달완료</button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
             });
         }
 
-        function setThumbnail(index) {
-            thumbnailIndex = index;
-            renderSelectedFilesList();
-        }
-
-        function removeSelectedFile(index) {
-            selectedFiles.splice(index, 1);
-            if (selectedFiles.length === 0) {
-                thumbnailIndex = -1;
-            } else if (thumbnailIndex === index) {
-                thumbnailIndex = 0;
-            } else if (thumbnailIndex > index) {
-                thumbnailIndex--;
+        // 공동현관 비밀번호 저장
+        async function saveEntrancePassword() {
+            if (!activeApartment || !activeDong) return;
+            const input = document.getElementById("entrance-password-input");
+            const pwd = input.value.trim();
+            showLoader("공동현관 비밀번호 저장 중...");
+            try {
+                const aptKey = encodeURIComponent(activeApartment);
+                const dongKey = encodeURIComponent(activeDong);
+                const url = `${FIREBASE_DB_URL}entrance_passwords/${aptKey}/${dongKey}.json`;
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pwd)
+                });
+                if (!res.ok) throw new Error("Firebase 저장 실패");
+                showToast("공동현관 비밀번호가 저장되었습니다.");
+                
+                if (!entrancePasswords[activeApartment]) {
+                    entrancePasswords[activeApartment] = {};
+                }
+                entrancePasswords[activeApartment][activeDong] = pwd;
+            } catch (e) {
+                console.error(e);
+                showToast("저장에 실패했습니다.");
+            } finally {
+                hideLoader();
             }
-            renderSelectedFilesList();
         }
 
-        // 로더 조절
+        // 단순 배달 완료 처리
+        async function markAsDelivered(phone, orderKey) {
+            if (!confirm("배달 완료 처리하시겠습니까?")) return;
+            showLoader("배달 완료 처리 중...");
+            const cleanPhone = String(phone).replace(/\D/g, "");
+            const url = `${FIREBASE_DB_URL}orders/${cleanPhone}/${orderKey}.json`;
+            try {
+                const patchBody = {
+                    status: "배달완료",
+                    canceled: false,
+                    isStocked: true,
+                    received: false,
+                    delivered: true
+                };
+                const res = await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(patchBody)
+                });
+                if (!res.ok) throw new Error("상태 업데이트 실패");
+                
+                showToast("배달 완료 처리되었습니다.");
+                await loadData();
+            } catch (e) {
+                console.error(e);
+                showToast("오류가 발생했습니다.");
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // 카메라 사진 업로드 준비
+        function triggerCameraUpload(phone, orderKey) {
+            activeUploadPhone = phone;
+            activeUploadKey = orderKey;
+            document.getElementById('camera-input').click();
+        }
+
+        // 배달 완료 사진 업로드 처리
+        async function handleDeliveryPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !activeUploadPhone || !activeUploadKey) return;
+            showLoader("사진 압축 및 업로드 중...");
+            try {
+                const compressedBase64 = await resizeAndCompressImage(file);
+                const cleanPhone = String(activeUploadPhone).replace(/\D/g, "");
+                const url = `${FIREBASE_DB_URL}orders/${cleanPhone}/${activeUploadKey}.json`;
+                
+                const patchBody = {
+                    status: "배달완료",
+                    canceled: false,
+                    isStocked: true,
+                    received: false,
+                    delivered: true,
+                    deliveryPhoto: compressedBase64,
+                    deliveryPhotoTime: Date.now()
+                };
+
+                const res = await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(patchBody)
+                });
+                if (!res.ok) throw new Error("사진 업로드 실패");
+
+                showToast("배달 사진이 업로드되었으며, 배달 완료 처리되었습니다.");
+                activeUploadPhone = "";
+                activeUploadKey = "";
+                await loadData();
+            } catch (e) {
+                console.error(e);
+                showToast("사진 업로드 실패");
+            } finally {
+                hideLoader();
+                event.target.value = "";
+            }
+        }
+
+        // 사진 팝업 모달
+        window.deliveryPhotos = {};
+        function viewDeliveryPhoto(key, photoData) {
+            const modal = document.getElementById("photo-modal");
+            const modalImg = document.getElementById("photo-modal-img");
+            if (modal && modalImg) {
+                modalImg.src = photoData;
+                modal.style.display = "flex";
+            }
+        }
+
+        // 사진 모달 닫기
+        function closePhotoModal() {
+            const modal = document.getElementById("photo-modal");
+            if (modal) modal.style.display = "none";
+        }
+
+        // 검색어 입력 이벤트
+        function handleSearchInput() {
+            renderFilteredData();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            if (input) {
+                input.value = '';
+                renderFilteredData();
+            }
+        }
+
+        // 유틸 UI 효과
         function showLoader(text = "처리 중입니다...") {
             document.getElementById('loader-text').innerText = text;
             document.getElementById('loader').style.display = 'flex';
         }
 
-        // 로더 닫기
         function hideLoader() {
             document.getElementById('loader').style.display = 'none';
         }
 
-        // 토스트 띄우기
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.add('show');
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.classList.add("show");
             setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+                toast.classList.remove("show");
+            }, 2500);
         }
 
-        // Firebase에서 상품 가져오기
-        async function fetchProducts() {
-            try {
-                const [res, stockRes] = await Promise.all([
-                    fetch(`${FIREBASE_DB_URL}published_products.json?t=${Date.now()}`),
-                    fetch(`${FIREBASE_DB_URL}global_stock.json?t=${Date.now()}`).catch(e => { console.error("Firebase 재고 로드 실패:", e); return { ok: false }; })
-                ]);
-                if (!res.ok) throw new Error("Firebase 연결 실패");
-                
-                const data = await res.json();
-                if (stockRes && stockRes.ok) {
-                    globalAdjustments = await stockRes.json() || {};
-                } else {
-                    globalAdjustments = {};
-                }
-                
-                if (data === null) {
-                    products = [];
-                } else if (Array.isArray(data)) {
-                    products = data.filter(p => p !== null);
-                } else if (typeof data === 'object') {
-                    products = Object.values(data);
-                }
-
-                selectedProductIndices.clear();
-                updateBatchBar();
-
-                // 기존 이모지가 포함된 카테고리값 정규화 (하위 호환성 보장)
-                products.forEach(prod => {
-                    if (prod && prod.matchKey) {
-                        if (prod.matchKey === "🧊냉동") prod.matchKey = "냉동";
-                        else if (prod.matchKey === "❄️냉장") prod.matchKey = "냉장";
-                        else if (prod.matchKey === "🌡️상온") prod.matchKey = "상온";
-                    }
-                });
-
-                document.getElementById('product-count').innerText = products.length;
-                buildSubTabs();
-                renderProductsList();
-            } catch (e) {
-                console.error("데이터 로드 실패:", e);
-                showToast("데이터 로드에 실패했습니다.");
-            }
-        }
-
-        // 상품 목록 그리기
-        function renderProductsList() {
-            const container = document.getElementById('products-list-container');
-            container.innerHTML = '';
-
-            if (products.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">등록된 상품이 없습니다.</div>`;
-                return;
-            }
-
-            // 1. 현재 선택된 관리 탭에 맞춰 상품 필터링
-            let filteredProducts = products.map((prod, index) => ({ prod, index }));
-            
-            if (currentManageTab !== 'all') {
-                filteredProducts = filteredProducts.filter(({ prod }) => {
-                    const mKey = prod.matchKey || "";
-                    let tabType = "reserve";
-                    if (mKey.includes("냉동") || mKey.includes("냉장") || mKey.includes("상온") || mKey.includes("실온") || mKey.includes("상시판매") || mKey.includes("현장판매")) {
-                        tabType = "onsite";
-                    } else if (mKey.includes("예약") && (mKey.includes("과일") || mKey.includes("야채") || mKey.includes("기타"))) {
-                        tabType = "fruit";
-                    } else if (mKey.includes("코스트코")) {
-                        tabType = "costco";
-                    } else {
-                        tabType = "reserve";
-                    }
-                    return tabType === currentManageTab;
-                });
-            }
-
-            // 1.5. 하위 소분류 필터링 적용
-            if (currentSubTab !== 'all') {
-                filteredProducts = filteredProducts.filter(({ prod }) => {
-                    if (currentManageTab === 'reserve') {
-                        return prod.date === currentSubTab;
-                    } else if (currentManageTab === 'onsite') {
-                        return prod.matchKey === currentSubTab;
-                    }
-                    return true;
-                });
-            }
-
-            if (filteredProducts.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px 0; color: var(--text-sub); font-size: 13px;">해당 카테고리에 등록된 상품이 없습니다.</div>`;
-                return;
-            }
-
-            // 2. 카테고리(matchKey)별로 상품 그룹화
-            const grouped = {};
-            filteredProducts.forEach(({ prod, index }) => {
-                const mKey = prod.matchKey || "기타";
-                if (!grouped[mKey]) {
-                    grouped[mKey] = [];
-                }
-                grouped[mKey].push({ prod, index });
-            });
-
-            // 2. 그룹 정렬 순서 정의
-            const groupKeys = Object.keys(grouped).sort((a, b) => {
-                const isDateA = /^\d{4}-\d{2}-\d{2}$/.test(a);
-                const isDateB = /^\d{4}-\d{2}-\d{2}$/.test(b);
-                if (isDateA && isDateB) return b.localeCompare(a); // 날짜 최신순
-                if (isDateA) return -1;
-                if (isDateB) return 1;
-                
-                if (a.includes("코스트코") && b.includes("코스트코")) return a.localeCompare(b);
-                if (a.includes("코스트코")) return 1;
-                if (b.includes("코스트코")) return -1;
-                
-                return a.localeCompare(b);
-            });
-
-            // 3. 그룹별 렌더링
-            groupKeys.forEach(mKey => {
-                const groupItems = grouped[mKey];
-                
-                let groupLabel = mKey;
-                let badgeClass = 'badge-reserve';
-                if (/^\d{4}-\d{2}-\d{2}$/.test(mKey)) {
-                    const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-                    const parts = mKey.split('-');
-                    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    if (!isNaN(d.getTime())) {
-                        groupLabel = `📅 공동구매 | ${parts[0]}년 ${parseInt(parts[1])}월 ${parseInt(parts[2])}일 (${daysOfWeek[d.getDay()]})`;
-                    } else {
-                        groupLabel = `📅 공동구매 | ${mKey}`;
-                    }
-                    badgeClass = 'badge-reserve';
-                } else if (mKey === '과일_예약' || mKey === '야채_예약' || mKey === '기타_예약') {
-                    const label = mKey === '과일_예약' ? '과일' : (mKey === '야채_예약' ? '야채' : '기타');
-                    groupLabel = `🍓 과일/야채 | ${label}`;
-                    badgeClass = 'badge-fruit';
-                } else if (mKey.includes("코스트코")) {
-                    groupLabel = `🛒 코스트코 | ${mKey.replace("코스트코", "").trim()}`;
-                    badgeClass = 'badge-costco';
-                } else {
-                    groupLabel = `🏪 상시판매 | ${mKey}`;
-                    badgeClass = 'badge-onsite';
-                }
-
-                // 카테고리 헤더
-                const headerDiv = document.createElement('div');
-                headerDiv.style = "font-size: 13px; font-weight: 850; color: var(--text-main); margin-top: 18px; margin-bottom: 8px; padding: 6px 12px; background-color: #f1f5f9; border-radius: 6px; display: flex; align-items: center; gap: 6px;";
-                
-                let borderStyle = "";
-                if (badgeClass === 'badge-reserve') borderStyle = "border-left: 4px solid var(--secondary);";
-                else if (badgeClass === 'badge-onsite') borderStyle = "border-left: 4px solid var(--primary);";
-                else if (badgeClass === 'badge-fruit') borderStyle = "border-left: 4px solid #b45309;";
-                else borderStyle = "border-left: 4px solid #475569;";
-                headerDiv.style.cssText += borderStyle;
-
-                const showHeaderCheckbox = selectedProductIndices.size > 0;
-                if (showHeaderCheckbox) {
-                    const allSelected = groupItems.every(({ index }) => selectedProductIndices.has(index));
-                    headerDiv.innerHTML = `
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; user-select: none;">
-                            <input type="checkbox" class="category-visibility-toggle" ${allSelected ? 'checked' : ''} onchange="toggleCategorySelection('${mKey.replace(/'/g, "\\'")}', this.checked)" style="width:16px; height:16px; cursor:pointer;">
-                            <span style="font-size: 13px; font-weight: 850;">${groupLabel} (${groupItems.length}개)</span>
-                        </label>
-                    `;
-                } else {
-                    headerDiv.innerHTML = `${groupLabel} (${groupItems.length}개)`;
-                }
-                container.appendChild(headerDiv);
-
-                // 그룹별 상품 묶음 박스
-                const listWrapper = document.createElement('div');
-                listWrapper.style = "background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; display: flex; flex-direction: column;";
-
-                groupItems.forEach(({ prod, index }) => {
-                    const imgUrl = (prod.images && prod.images[0]) 
-                        ? `https://lh3.googleusercontent.com/d/${prod.images[0]}=w200`
-                        : '';
-
-                    const baseStockStr = prod.stock;
-                    const isUnlimited = (baseStockStr === "" || baseStockStr === "unlimited" || baseStockStr === 9999 || baseStockStr === "9999" || baseStockStr === "무제한");
-                    
-                    let stockHtml = "";
-                    const adjKey = fGetAdjKey(prod.matchKey || prod.date || "", prod.name);
-                    const adj = globalAdjustments[encodeURIComponent(adjKey)] || globalAdjustments[adjKey];
-                    const orderQty = (adj && !isNaN(parseInt(adj))) ? -parseInt(adj) : 0;
-
-                    if (isUnlimited) {
-                        if (orderQty > 0) {
-                            stockHtml = `<strong style="color: var(--text-main);">무제한</strong> <span style="font-size: 11px; color: var(--secondary); font-weight: normal;">(주문: ${orderQty}개)</span>`;
-                        } else {
-                            stockHtml = `<strong style="color: var(--text-main);">무제한</strong>`;
-                        }
-                    } else {
-                        const baseStock = parseInt(baseStockStr || 0);
-                        const remainingStock = Math.max(0, baseStock - orderQty);
-                        
-                        if (orderQty > 0) {
-                            stockHtml = `<strong style="color: var(--text-main);">${remainingStock}개</strong> <span style="font-size: 11px; color: var(--text-sub); font-weight: normal;">(기본: ${baseStock}개 / 주문: <span style="color: var(--secondary); font-weight: bold;">${orderQty}개</span>)</span>`;
-                        } else {
-                            stockHtml = `<strong style="color: var(--text-main);">${baseStock}개</strong>`;
-                        }
-                    }
-
-                    const isHidden = prod.hidden === true || prod.hidden === "true";
-                    const isSelected = selectedProductIndices.has(index);
-                    const item = document.createElement('div');
-                    item.className = 'product-item' + (isSelected ? ' selected' : '');
-                    
-                    // 마우스 및 터치 이벤트 추가 (길게 누르기 감지)
-                    item.addEventListener('mousedown', (e) => handleTouchStart(e, index));
-                    item.addEventListener('touchstart', (e) => handleTouchStart(e, index), { passive: false });
-                    
-                    item.addEventListener('mousemove', handleTouchMove);
-                    item.addEventListener('touchmove', handleTouchMove, { passive: true });
-                    
-                    item.addEventListener('mouseup', (e) => handleTouchEnd(e, index));
-                    item.addEventListener('touchend', (e) => handleTouchEnd(e, index));
-                    
-                    item.addEventListener('mouseleave', () => {
-                        if (longPressTimer) {
-                            clearTimeout(longPressTimer);
-                            longPressTimer = null;
-                        }
-                    });
-
-                    item.innerHTML = `
-                        ${imgUrl ? `<img src="${imgUrl}" class="product-img" alt="상품 이미지" style="position:relative;">` : `<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;">📦</div>`}
-                        <div class="product-info" style="${isHidden ? 'opacity: 0.6;' : ''}">
-                            <div>
-                                <div class="product-name" style="font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
-                                    <span>${prod.name}</span>
-                                    ${isHidden 
-                                        ? '<span style="font-size:10px; font-weight:700; background:#fee2e2; color:#ef4444; padding:1px 6px; border-radius:4px; line-height:1.2; flex-shrink:0;">🙈 숨김</span>' 
-                                        : '<span style="font-size:10px; font-weight:700; background:#e8f5e9; color:#2e7d32; padding:1px 6px; border-radius:4px; line-height:1.2; flex-shrink:0;">👁️ 노출중</span>'}
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-sub); margin-top: 2px;">
-                                    ${prod.desc ? prod.desc.substring(0, 40) + (prod.desc.length > 40 ? '...' : '') : '설명 없음'}
-                                </div>
-                            </div>
-                            <div style="margin-top: 6px;">
-                                <div class="product-price-stock" style="font-size: 12px; font-weight: 600; color: var(--text-sub);">
-                                    가격: <strong style="color: var(--text-main);">${prod.price.toLocaleString()}원</strong> / 재고: ${stockHtml}
-                                </div>
-                                <div class="product-actions" style="margin-top: 8px;">
-                                    <button type="button" class="action-btn action-edit" onclick="startEdit(${index}); event.stopPropagation();">✏️ 수정</button>
-                                    <button type="button" class="action-btn action-delete" onclick="deleteProduct(${index}); event.stopPropagation();">🗑️ 삭제</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    listWrapper.appendChild(item);
-                });
-                container.appendChild(listWrapper);
-            });
-        }
-
-        function toggleProductSelection(index, isChecked) {
-            if (isChecked) {
-                selectedProductIndices.add(index);
-            } else {
-                selectedProductIndices.delete(index);
-            }
-            updateBatchBar();
-        }
-
-        function toggleCategorySelection(mKey, isChecked) {
-            products.forEach((p, idx) => {
-                const prodMKey = p.matchKey || "기타";
-                if (prodMKey === mKey) {
-                    if (isChecked) {
-                        selectedProductIndices.add(idx);
-                    } else {
-                        selectedProductIndices.delete(idx);
-                    }
-                }
-            });
-            renderProductsList();
-            updateBatchBar();
-        }
-
-        function updateBatchBar() {
-            const count = selectedProductIndices.size;
-            document.getElementById('selection-count-text').innerText = `${count}개 상품 선택됨`;
-            
-            const batchBar = document.querySelector('.batch-action-bar');
-            if (batchBar) {
-                if (count > 0) {
-                    batchBar.classList.add('show');
-                } else {
-                    batchBar.classList.remove('show');
-                }
-            }
-        }
-
-        async function handleBatchVisibility(isVisible) {
-            if (selectedProductIndices.size === 0) return;
-            
-            showLoader("노출 설정 변경 중...");
-            try {
-                selectedProductIndices.forEach(idx => {
-                    if (products[idx]) {
-                        products[idx].hidden = !isVisible;
-                    }
-                });
-                
-                const writeRes = await fetch(`${FIREBASE_DB_URL}published_products.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(products)
-                });
-                if (!writeRes.ok) throw new Error("Firebase 업데이트 실패");
-                
-                showToast(isVisible ? "선택한 상품들을 노출 설정했습니다." : "선택한 상품들을 숨김 처리했습니다.");
-                selectedProductIndices.clear();
-                updateBatchBar();
-                renderProductsList();
-            } catch (e) {
-                console.error(e);
-                showToast("변경 실패: " + e.toString());
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // 마우스/터치 길게 누르기 이벤트 헬퍼
-        let longPressTimer = null;
-        let touchStartPos = { x: 0, y: 0 };
-        let isLongPressTriggered = false;
-
-        function handleTouchStart(e, index) {
-            // 수정/삭제 버튼 클릭 시 무시
-            if (e.target.closest('.product-actions') || e.target.closest('.action-btn')) {
-                return;
-            }
-            
-            isLongPressTriggered = false;
-            const touch = e.touches ? e.touches[0] : e;
-            touchStartPos = { x: touch.clientX, y: touch.clientY };
-            
-            longPressTimer = setTimeout(() => {
-                isLongPressTriggered = true;
-                if (navigator.vibrate) navigator.vibrate(50);
-                
-                // 선택 상태 전환
-                toggleProductSelection(index, !selectedProductIndices.has(index));
-                renderProductsList();
-            }, 600); // 600ms 길게 누르기 감지
-        }
-
-        function handleTouchMove(e) {
-            if (!longPressTimer) return;
-            const touch = e.touches ? e.touches[0] : e;
-            const dx = Math.abs(touch.clientX - touchStartPos.x);
-            const dy = Math.abs(touch.clientY - touchStartPos.y);
-            if (dx > 10 || dy > 10) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        }
-
-        function handleTouchEnd(e, index) {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-            
-            if (isLongPressTriggered) {
-                e.preventDefault();
-                isLongPressTriggered = false;
-                return;
-            }
-
-            // 이미 선택 모드인 경우 단발 클릭으로 토글
-            if (selectedProductIndices.size > 0) {
-                if (e.target.closest('.product-actions') || e.target.closest('.action-btn')) {
-                    return;
-                }
-                e.preventDefault();
-                toggleProductSelection(index, !selectedProductIndices.has(index));
-                renderProductsList();
-            }
-        }
-
-        // 상품 정보 수정 모드로 전환
-        function startEdit(index) {
-            const prod = products[index];
-            if (!prod) return;
-
-            isEditMode = true;
-            editProductKey = index;
-
-            // 폼 필드 입력값 세팅
-            document.getElementById('productName').value = prod.name;
-            document.getElementById('productPrice').value = prod.price;
-            selectedDate = prod.date || new Date().toISOString().split('T')[0];
-            
-            const descTextarea = document.getElementById('productDesc');
-            descTextarea.value = prod.desc || "";
-
-            const isUnlimited = (prod.stock === "" || prod.stock === "unlimited" || prod.stock === 9999 || prod.stock === "9999");
-            document.getElementById('unlimitedStock').checked = isUnlimited;
-            const stockInput = document.getElementById('productStock');
-            if (isUnlimited) {
-                stockInput.value = "9999";
-                stockInput.disabled = true;
-            } else {
-                stockInput.value = prod.stock;
-                stockInput.disabled = false;
-            }
-
-            // 대분류 판별 및 탭 매칭
-            const mKey = prod.matchKey || "";
-            let tabType = "reserve";
-            if (mKey.includes("냉동") || mKey.includes("냉장") || mKey.includes("상온") || mKey.includes("실온") || mKey.includes("상시판매") || mKey.includes("현장판매")) {
-                tabType = "onsite";
-            } else if (mKey.includes("예약") && (mKey.includes("과일") || mKey.includes("야채") || mKey.includes("기타"))) {
-                tabType = "fruit";
-            } else if (mKey.includes("코스트코")) {
-                tabType = "costco";
-            } else {
-                tabType = "reserve";
-            }
-
-            selectMainTab(tabType);
-
-            // 세부 카테고리 값 복원
-            setTimeout(() => {
-                const catVal = document.getElementById('categoryValue');
-                if (catVal) {
-                    catVal.value = mKey;
-                }
-            }, 50);
-
-            // 이미지 목록 처리
-            selectedFiles = [];
-            thumbnailIndex = -1;
-            
-            if (prod.images && prod.images.length > 0) {
-                prod.images.forEach((imgId, idx) => {
-                    selectedFiles.push({
-                        file: null,
-                        id: imgId,
-                        isExisting: true,
-                        displayName: `기존 사진 ${idx + 1}`
-                    });
-                });
-                thumbnailIndex = 0; // 첫 번째 이미지를 대표 섬네일로 기본 지정
-            }
-            
-            renderSelectedFilesList();
-
-            // UI 변경
-            document.getElementById('form-card-title').innerText = "✏️ 상품 정보 수정";
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "💾 상품 정보 수정 저장";
-            submitBtn.classList.add('edit-mode');
-            document.getElementById('cancelBtn').style.display = 'block';
-
-            // 탭 전환
-            switchTab('upload');
-
-            // 탭이 화면에 렌더링된 이후 높이를 감지할 수 있도록 약간의 시간차를 둠
-            setTimeout(() => {
-                autoResizeTextarea(descTextarea);
-            }, 50);
-        }
-
-        // 수정 모드 해제
-        function exitEditMode() {
-            isEditMode = false;
-            editProductKey = null;
-            uploadedImageId = null;
-
-            // 폼 초기화
-            document.getElementById('productForm').reset();
-            document.getElementById('productStock').disabled = false;
-            
-            const descTextarea = document.getElementById('productDesc');
-            descTextarea.style.height = 'auto';
-            
-            // 파일 목록 리셋
-            selectedFiles = [];
-            thumbnailIndex = -1;
-            renderSelectedFilesList();
-
-            // UI 복구
-            document.getElementById('form-card-title').innerText = "✨ 신규 상품 등록";
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "🚀 상품 등록 완료";
-            submitBtn.classList.remove('edit-mode');
-            document.getElementById('cancelBtn').style.display = 'none';
-
-            // 오늘 날짜 세팅
-            selectedDate = new Date().toISOString().split('T')[0];
-            selectMainTab('fruit');
-        }
-
-        // 상품 정보 삭제
-        async function deleteProduct(index) {
-            const prod = products[index];
-            if (!prod) return;
-
-            if (!confirm(`[${prod.name}] 상품을 정말 삭제하시겠습니까?\n삭제 즉시 주문서 앱에서 사라집니다.`)) return;
-
-            showLoader("상품 정보 삭제 중...");
-            try {
-                // 해당 상품 제외하고 새로운 배열 구성
-                const updatedList = products.filter((_, idx) => idx !== index);
-                
-                // Firebase PUT 요청 전송
-                const res = await fetch(`${FIREBASE_DB_URL}published_products.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedList)
-                });
-
-                if (!res.ok) throw new Error("Firebase 삭제 동기화 실패");
-
-                products = updatedList;
-                document.getElementById('product-count').innerText = products.length;
-                
-                showToast("상품이 성공적으로 삭제되었습니다.");
-                buildSubTabs();
-                renderProductsList();
-            } catch (e) {
-                console.error("삭제 중 오류 발생:", e);
-                showToast("삭제하지 못했습니다: " + e.toString());
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // 폼 제출 (저장 / 등록)
-        async function submitForm(event) {
-            event.preventDefault();
-
-            const name = document.getElementById('productName').value.trim();
-            const price = parseInt(document.getElementById('productPrice').value);
-            const desc = document.getElementById('productDesc').value.trim();
-            
-            const isUnlimited = document.getElementById('unlimitedStock').checked;
-            let stock = isUnlimited ? "" : parseInt(document.getElementById('productStock').value);
-            if (isUnlimited) stock = "";
-
-            // 매치 키 및 날짜 정의
-            const catVal = document.getElementById('categoryValue').value;
-            let matchKey = catVal;
-            let date = "";
-            if (currentTab === 'reserve') {
-                matchKey = catVal; // 날짜 문자열 (YYYY-MM-DD)
-                date = catVal;      // 날짜 문자열 (YYYY-MM-DD)
-            }
-
-            if (!name) {
-                showToast("상품명을 입력해주세요.");
-                return;
-            }
-
-            try {
-                const finalImages = [];
-                
-                // 1. 순차적으로 새로운 사진 파일들을 Google Drive에 업로드
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    const item = selectedFiles[i];
-                    if (item.isExisting) {
-                        continue;
-                    }
-                    
-                    showLoader(`📸 사진 업로드 중 (${i + 1}/${selectedFiles.length}): ${item.displayName}`);
-                    const base64Data = await getCompressedBase64(item.file);
-                    
-                    const payload = {
-                        header: "upload_image",
-                        productName: name,
-                        base64: base64Data,
-                        filename: `${Date.now()}_${item.file.name}`,
-                        contentType: item.file.type
-                    };
-
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/plain'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) throw new Error(`[${item.displayName}] 이미지 업로드 실패`);
-                    const resJson = await response.json();
-                    
-                    if (resJson.result === 'success') {
-                        // 대안 키(fileId, id, fileid) 동시 매핑 지원으로 호환성 100% 보장
-                        item.id = resJson.fileId || resJson.id || resJson.fileid || null;
-                    } else {
-                        throw new Error(resJson.message || "이미지 서버 응답 에러");
-                    }
-                }
-
-                // 2. 섬네일(대표 이미지)로 지정된 ID가 배열의 0번째 인덱스에 오도록 정렬하여 최종 배열 구성
-                if (thumbnailIndex >= 0 && thumbnailIndex < selectedFiles.length) {
-                    const thumb = selectedFiles[thumbnailIndex];
-                    if (thumb.id) finalImages.push(thumb.id);
-                }
-                selectedFiles.forEach((item, idx) => {
-                    if (idx !== thumbnailIndex && item.id) {
-                        finalImages.push(item.id);
-                    }
-                });
-
-                // Firebase 데이터 배포
-                showLoader("💾 Firebase 주문서 데이터베이스 반영 중...");
-
-                const productObj = {
-                    name: name,
-                    price: price,
-                    stock: stock,
-                    desc: desc,
-                    date: date,
-                    matchKey: matchKey,
-                    images: finalImages,
-                    folderId: "",
-                    isWebUploaded: true
-                };
-
-                let updatedProducts = [...products];
-
-                if (isEditMode && editProductKey !== null) {
-                    // 수정 모드: 기존 항목 업데이트
-                    updatedProducts[editProductKey] = productObj;
-                } else {
-                    // 등록 모드: 기존 목록에 동일한 이름&날짜가 있는지 중복 검사
-                    const dupIndex = updatedProducts.findIndex(p => p.name === name && p.date === date);
-                    if (dupIndex > -1) {
-                        if (!confirm("동일한 날짜에 같은 이름의 상품이 이미 등록되어 있습니다.\n덮어쓰시겠습니까?")) {
-                            hideLoader();
-                            return;
-                        }
-                        updatedProducts[dupIndex] = productObj;
-                    } else {
-                        updatedProducts.push(productObj);
-                    }
-                }
-
-                // [디버깅 알림]
-                showToast(`디버깅 - 업로드 완료 이미지 수: ${finalImages.length}개 / ID목록: ${JSON.stringify(finalImages)}`);
-                await new Promise(r => setTimeout(r, 1500)); // 토스트를 눈으로 읽을 수 있게 잠시 지연
-
-                // Firebase PUT 전송
-                const writeRes = await fetch(`${FIREBASE_DB_URL}published_products.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedProducts)
-                });
-
-                if (!writeRes.ok) throw new Error("Firebase 배포 실패");
-
-                products = updatedProducts;
-                document.getElementById('product-count').innerText = products.length;
-
-                showToast(isEditMode ? "상품 수정이 완료되었습니다!" : "새로운 상품이 성공적으로 등록되었습니다!");
-                
-                // 상태 리셋 및 탭 이동
-                exitEditMode();
-                buildSubTabs();
-                switchTab('manage');
-            } catch (e) {
-                console.error("제출 에러:", e);
-                showToast("업로드 중 에러가 발생했습니다: " + e.toString());
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // 파일을 리사이징 및 JPEG 압축하여 가벼운 base64 포맷으로 변경하는 최적화 헬퍼 함수
-        function getCompressedBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            const maxDimension = 1024; // 최대 가로세로 해상도 1024px 제한
-                            let width = img.width;
-                            let height = img.height;
-
-                            if (width > maxDimension || height > maxDimension) {
-                                if (width > height) {
-                                    height = Math.round((height * maxDimension) / width);
-                                    width = maxDimension;
-                                } else {
-                                    width = Math.round((width * maxDimension) / height);
-                                    height = maxDimension;
-                                }
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            // JPEG 포맷으로 압축 품질 70% 설정 적용
-                            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
-                            resolve(compressedBase64);
-                        } catch (err) {
-                            reject(err);
-                        }
-                    };
-                    img.onerror = (err) => reject(err);
-                };
-                reader.onerror = (err) => reject(err);
-            });
-        }
-
+        window.onload = function() {
+            loadData();
+        };
     </script>
 </body>
 </html>
