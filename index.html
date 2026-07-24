@@ -977,6 +977,19 @@
             const clearBtn = document.getElementById('clearSearchBtn');
             if (clearBtn) clearBtn.style.display = search !== "" ? "flex" : "none";
 
+            // 주문고객별 고유 건수 구하는 헬퍼 함수
+            const getUniqueCustomerCount = (ordersList) => {
+                const customerKeys = new Set();
+                ordersList.forEach(item => {
+                    const cleanPhone = String(item.phone || "").replace(/\D/g, "");
+                    const customerKey = cleanPhone || String(item.name || "").trim();
+                    if (customerKey) {
+                        customerKeys.add(customerKey);
+                    }
+                });
+                return customerKeys.size;
+            };
+
             // 1단계: 선택 날짜 필터링
             let filtered = rawOrders.filter(item => {
                 const info = getOrderDateInfo(item);
@@ -1047,7 +1060,7 @@
             // "전체" 아파트 버튼 생성
             const allAptBtn = document.createElement('button');
             allAptBtn.className = `btn-select apt-btn ${activeApartment === '전체' ? 'active' : ''}`;
-            allAptBtn.innerText = `전체 (${filtered.length})`;
+            allAptBtn.innerText = `전체 (${getUniqueCustomerCount(filtered)})`;
             allAptBtn.onclick = () => {
                 activeApartment = "전체";
                 activeDong = "전체";
@@ -1062,7 +1075,7 @@
             apartments.forEach(apt => {
                 const btn = document.createElement('button');
                 btn.className = `btn-select apt-btn ${apt === activeApartment ? 'active' : ''}`;
-                btn.innerText = `${apt} (${aptGroups[apt].length})`;
+                btn.innerText = `${apt} (${getUniqueCustomerCount(aptGroups[apt])})`;
                 btn.onclick = () => {
                     activeApartment = apt;
                     activeDong = "전체"; // 아파트 변경 시 동을 "전체"로 설정
@@ -1119,7 +1132,7 @@
             // "전체" 버튼 생성
             const allBtn = document.createElement('button');
             allBtn.className = `btn-select dong-btn ${activeDong === '전체' ? 'active' : ''}`;
-            allBtn.innerText = `전체 (${aptOrders.length})`;
+            allBtn.innerText = `전체 (${getUniqueCustomerCount(aptOrders)})`;
             allBtn.onclick = () => {
                 activeDong = "전체";
                 document.querySelectorAll('.dong-btn').forEach(b => b.classList.remove('active'));
@@ -1131,7 +1144,7 @@
             dongs.forEach(dong => {
                 const btn = document.createElement('button');
                 btn.className = `btn-select dong-btn ${dong === activeDong ? 'active' : ''}`;
-                btn.innerText = `${dong} (${dongGroups[dong].length})`;
+                btn.innerText = `${dong} (${getUniqueCustomerCount(dongGroups[dong])})`;
                 btn.onclick = () => {
                     activeDong = dong;
                     document.querySelectorAll('.dong-btn').forEach(b => b.classList.remove('active'));
