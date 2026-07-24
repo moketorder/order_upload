@@ -693,13 +693,24 @@
 
         // 동 번호(숫자) 추출 헬퍼
         function getDongNumber(addressDetail, address) {
-            const fullAddr = `${address || ''} ${addressDetail || ''}`;
-            let match = fullAddr.match(/([0-9]+)\s*동/);
+            const detail = String(addressDetail || "").trim();
+            // 1. 상세주소에서 '동' 찾기
+            let match = detail.match(/([0-9]+)\s*동/);
             if (match) return match[1];
-            match = fullAddr.match(/([0-9]+)\s*-\s*[0-9]+/);
+            
+            // 2. 상세주소에서 '101-102' 형태의 동-호수 찾기 (동은 앞의 숫자)
+            match = detail.match(/([0-9]+)\s*-\s*[0-9]+/);
             if (match) return match[1];
-            match = fullAddr.match(/\b([0-9]+)\b/);
+            
+            // 3. 상세주소에서 단순 숫자 찾기
+            match = detail.match(/\b([0-9]+)\b/);
             if (match) return match[1];
+            
+            // 4. 전체 주소에서 '동' 찾기 (상세주소에 없었을 경우 대비)
+            const fullAddr = `${address || ''} ${detail}`;
+            match = fullAddr.match(/([0-9]+)\s*동/);
+            if (match) return match[1];
+            
             return "";
         }
 
@@ -1186,7 +1197,21 @@
                     return extractHoNum(a) - extractHoNum(b);
                 });
             } else {
-                dongOrders.sort((a, b) => extractHoNum(a) - extractHoNum(b));
+                // 특정 아파트 선택 상태일 때
+                if (activeDong === "전체") {
+                    // 동별 '전체' 보기 상태이면 동을 먼저 정렬하고, 그 다음에 호수를 정렬
+                    dongOrders.sort((a, b) => {
+                        const dongA = getDongNumber(a.addressDetail, a.address);
+                        const dongB = getDongNumber(b.addressDetail, b.address);
+                        if (dongA !== dongB) {
+                            return dongA.localeCompare(dongB, undefined, {numeric: true});
+                        }
+                        return extractHoNum(a) - extractHoNum(b);
+                    });
+                } else {
+                    // 특정 동 선택 상태이면 호수로만 정렬
+                    dongOrders.sort((a, b) => extractHoNum(a) - extractHoNum(b));
+                }
             }
 
             // 고객별(전화번호 기준) 주문 그룹화
