@@ -893,6 +893,18 @@
             currentYear = activeMonthInfo.year;
             currentMonth = activeMonthInfo.month;
 
+            // 기본 활성화할 일(오늘 날짜 우선) 결정
+            const todayDayStr = now.getDate() + "일";
+            if (!currentDay) {
+                if (activeMonthInfo.days.has(todayDayStr)) {
+                    currentDay = todayDayStr;
+                } else {
+                    currentDay = "전체";
+                }
+            } else if (currentDay !== "전체" && !activeMonthInfo.days.has(currentDay)) {
+                currentDay = "전체";
+            }
+
             // 3. 월 드롭다운 옵션 렌더링
             const selectEl = document.getElementById('month-select');
             if (selectEl) {
