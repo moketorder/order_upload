@@ -113,6 +113,22 @@
         .date-tabs-container::-webkit-scrollbar {
             display: none;
         }
+        .select-dropdown {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sub);
+            font-size: 14px;
+            font-weight: 800;
+            border: 1.5px solid #cbd5e1;
+            background: #ffffff;
+            color: var(--text-main);
+            outline: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            transition: var(--transition);
+        }
+        .select-dropdown:focus {
+            border-color: var(--primary);
+        }
         .date-tab-btn {
             flex-shrink: 0;
             padding: 8px 14px;
@@ -188,6 +204,22 @@
             flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 14px;
+        }
+        .swipe-container {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 4px 2px;
+        }
+        .swipe-container::-webkit-scrollbar {
+            display: none;
+        }
+        .swipe-container .btn-select {
+            flex-shrink: 0;
         }
         .btn-select {
             padding: 10px 14px;
@@ -466,6 +498,7 @@
             opacity: 0;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
             z-index: 10000;
+            white-space: nowrap;
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
@@ -527,6 +560,12 @@
     </div>
 
     <div class="container">
+        <!-- 월 필터 드롭다운 -->
+        <div style="margin-bottom: 8px;">
+            <select id="month-select" class="select-dropdown" onchange="handleMonthChange(this.value)">
+                <!-- 동적 로드 -->
+            </select>
+        </div>
         <!-- 날짜 필터 탭 -->
         <div class="date-tabs-container" id="date-tabs">
             <!-- 동적 로드 -->
@@ -542,14 +581,14 @@
 
         <!-- 아파트 선택 버튼 그룹 -->
         <div class="section-title">🏢 아파트 단지 선택</div>
-        <div class="selector-group" id="apartment-buttons">
+        <div class="swipe-container" id="apartment-buttons">
             <!-- 동적 로드 -->
         </div>
 
         <!-- 동 선택 버튼 그룹 -->
         <div id="dong-section" style="display: none;">
             <div class="section-title">🚪 동 선택</div>
-            <div class="selector-group" id="dong-buttons">
+            <div class="swipe-container" id="dong-buttons">
                 <!-- 동적 로드 -->
             </div>
         </div>
@@ -750,7 +789,6 @@
                         
                         const isCanceled = (it.canceled === true || it.canceled === "true" || String(it.canceled).toUpperCase() === "TRUE");
                         if (isCanceled) continue; // 취소 건 제외
-
                         // 배달 주문만 필터링 (수령방법이 배달주문이거나, 수령방법이 매장픽업이 아닌데 주소가 써있을 때)
                         const isDelivery = (it.shippingMethod === '배달주문' || (it.shippingMethod !== '매장픽업' && it.address && String(it.address).trim() !== ""));
                         if (!isDelivery) continue;
@@ -786,62 +824,122 @@
             }
         }
 
+        function handleMonthChange(value) {
+            const parts = value.split(' '); // "2026년 7월" -> ["2026년", "7월"]
+            currentYear = parts[0];
+            currentMonth = parts[1];
+            currentDay = "전체";
+            
+            buildDateTabs();
+        }
+
         // 날짜 탭 구축
         function buildDateTabs() {
             const dateContainer = document.getElementById('date-tabs');
+            
+            if (!dateContainer) return;
+            
             dateContainer.innerHTML = '';
 
-            const dateSet = new Set();
+            // 1. 모든 주문에서 유효한 년, 월, 일 정보 수집
+            const monthsMap = {}; // Key: "YYYY년 MM월" -> { year: "YYYY년", month: "MM월", days: Set }
+            
             rawOrders.forEach(item => {
                 const info = getOrderDateInfo(item);
                 if (info.dateStr && info.dateStr !== "기타") {
-                    dateSet.add(info.dateStr);
+                    const parts = info.dateStr.split('-');
+                    const y = parts[0] + "년";
+                    const m = parseInt(parts[1]) + "월";
+                    const d = parseInt(parts[2]) + "일";
+                    const monthKey = `${y} ${m}`;
+                    
+                    if (!monthsMap[monthKey]) {
+                        monthsMap[monthKey] = {
+                            year: y,
+                            month: m,
+                            days: new Set()
+                        };
+                    }
+                    monthsMap[monthKey].days.add(d);
                 }
             });
 
-            const sortedDates = [...dateSet].sort((a, b) => b.localeCompare(a)); // 최신순
+            const sortedMonthKeys = Object.keys(monthsMap).sort((a, b) => {
+                const parseKey = (key) => {
+                    const match = key.match(/(\d+)년\s*(\d+)월/);
+                    return match ? parseInt(match[1]) * 100 + parseInt(match[2]) : 0;
+                };
+                return parseKey(b) - parseKey(a);
+            });
 
-            if (sortedDates.length === 0) {
+            if (sortedMonthKeys.length === 0) {
                 dateContainer.innerHTML = '<div style="font-weight:700; color:var(--text-sub); padding:10px;">배달 예약 정보가 없습니다.</div>';
                 return;
             }
 
-            // 오늘 날짜 기본 활성화 우선
-            const todayStr = new Date().toISOString().split('T')[0];
-            let activeDate = sortedDates.includes(todayStr) ? todayStr : sortedDates[0];
+            // 2. 기본 활성화할 월 결정
+            const now = new Date();
+            const thisMonthKey = `${now.getFullYear()}년 ${now.getMonth() + 1}월`;
+            let activeMonthKey = sortedMonthKeys.includes(thisMonthKey) ? thisMonthKey : sortedMonthKeys[0];
 
-            if (currentYear && currentMonth && currentDay) {
-                const prevActiveDate = `${currentYear}-${currentMonth.replace("월","").padStart(2,'0')}-${currentDay.replace("일","").padStart(2,'0')}`;
-                if (sortedDates.includes(prevActiveDate)) {
-                    activeDate = prevActiveDate;
+            if (currentYear && currentMonth) {
+                const savedMonthKey = `${currentYear} ${currentMonth}`;
+                if (sortedMonthKeys.includes(savedMonthKey)) {
+                    activeMonthKey = savedMonthKey;
                 }
             }
 
-            // 전역 날짜 변수 설정
-            const parts = activeDate.split('-');
-            currentYear = parts[0] + "년";
-            currentMonth = parseInt(parts[1]) + "월";
-            currentDay = parseInt(parts[2]) + "일";
+            const activeMonthInfo = monthsMap[activeMonthKey];
+            currentYear = activeMonthInfo.year;
+            currentMonth = activeMonthInfo.month;
 
-            sortedDates.forEach(dateStr => {
+            // 3. 월 드롭다운 옵션 렌더링
+            const selectEl = document.getElementById('month-select');
+            if (selectEl) {
+                selectEl.innerHTML = '';
+                sortedMonthKeys.forEach(mKey => {
+                    const opt = document.createElement('option');
+                    opt.value = mKey;
+                    opt.innerText = mKey;
+                    opt.selected = (mKey === activeMonthKey);
+                    selectEl.appendChild(opt);
+                });
+            }
+
+            // 4. 일(Day) 탭 버튼 렌더링
+            const daysSet = activeMonthInfo.days;
+            const sortedDays = [...daysSet].sort((a, b) => {
+                const getNum = (s) => parseInt(s.replace("일", ""));
+                return getNum(b) - getNum(a); // 최신 일이 먼저
+            });
+
+            // "전체" 버튼 생성
+            const allDayBtn = document.createElement('button');
+            allDayBtn.className = `date-tab-btn ${currentDay === '전체' ? 'active' : ''}`;
+            allDayBtn.innerText = `전체`;
+            allDayBtn.onclick = () => {
+                currentDay = "전체";
+                document.querySelectorAll('#date-tabs .date-tab-btn').forEach(b => b.classList.remove('active'));
+                allDayBtn.classList.add('active');
+                
+                activeApartment = "";
+                activeDong = "전체";
+                renderFilteredData();
+            };
+            dateContainer.appendChild(allDayBtn);
+
+            // 개별 일 버튼 생성
+            sortedDays.forEach(day => {
                 const btn = document.createElement('button');
-                btn.className = `date-tab-btn ${dateStr === activeDate ? 'active' : ''}`;
-                
-                const dParts = dateStr.split('-');
-                btn.innerText = `${parseInt(dParts[1])}/${parseInt(dParts[2])}`;
-                
+                btn.className = `date-tab-btn ${day === currentDay ? 'active' : ''}`;
+                btn.innerText = day;
                 btn.onclick = () => {
-                    const parts = dateStr.split('-');
-                    currentYear = parts[0] + "년";
-                    currentMonth = parseInt(parts[1]) + "월";
-                    currentDay = parseInt(parts[2]) + "일";
-                    
-                    document.querySelectorAll('.date-tab-btn').forEach(b => b.classList.remove('active'));
+                    currentDay = day;
+                    document.querySelectorAll('#date-tabs .date-tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     
-                    // 초기화 후 렌더링
                     activeApartment = "";
-                    activeDong = "";
+                    activeDong = "전체";
                     renderFilteredData();
                 };
                 dateContainer.appendChild(btn);
@@ -859,8 +957,16 @@
             // 1단계: 선택 날짜 필터링
             let filtered = rawOrders.filter(item => {
                 const info = getOrderDateInfo(item);
-                const itemYear = info.dateStr && info.dateStr !== "기타" ? (info.dateStr.split('-')[0] + "년") : "기타";
-                return itemYear === currentYear && info.month === currentMonth && info.day === currentDay;
+                if (info.dateStr === "기타") return false;
+                
+                const parts = info.dateStr.split('-');
+                const itemYear = parts[0] + "년";
+                const itemMonth = parseInt(parts[1]) + "월";
+                const itemDay = parseInt(parts[2]) + "일";
+
+                if (itemYear !== currentYear || itemMonth !== currentMonth) return false;
+                if (currentDay !== "전체" && itemDay !== currentDay) return false;
+                return true;
             });
 
             // 2단계: 검색어 필터링
@@ -891,7 +997,17 @@
             const aptContainer = document.getElementById('apartment-buttons');
             aptContainer.innerHTML = '';
 
-            const apartments = Object.keys(aptGroups).sort();
+            const customOrder = ["푸르지오", "센트리버", "리버나인", "더샵", "더샾", "칸타빌"];
+            const apartments = Object.keys(aptGroups).sort((a, b) => {
+                if (a === "기타") return 1;
+                if (b === "기타") return -1;
+                const idxA = customOrder.indexOf(a);
+                const idxB = customOrder.indexOf(b);
+                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                if (idxA !== -1) return -1;
+                if (idxB !== -1) return 1;
+                return a.localeCompare(b);
+            });
             if (apartments.length === 0) {
                 aptContainer.innerHTML = '<div style="font-size:13px; color:var(--text-sub); font-weight:700; padding:10px;">배달 건이 없습니다.</div>';
                 document.getElementById('dong-section').style.display = 'none';
@@ -899,9 +1015,26 @@
                 return;
             }
 
-            if (!activeApartment || !apartments.includes(activeApartment)) {
-                activeApartment = apartments[0];
+            if (!activeApartment) {
+                activeApartment = "전체";
+            } else if (activeApartment !== "전체" && !apartments.includes(activeApartment)) {
+                activeApartment = "전체";
             }
+
+            // "전체" 아파트 버튼 생성
+            const allAptBtn = document.createElement('button');
+            allAptBtn.className = `btn-select apt-btn ${activeApartment === '전체' ? 'active' : ''}`;
+            allAptBtn.innerText = `전체 (${filtered.length})`;
+            allAptBtn.onclick = () => {
+                activeApartment = "전체";
+                activeDong = "전체";
+                document.querySelectorAll('.apt-btn').forEach(b => b.classList.remove('active'));
+                allAptBtn.classList.add('active');
+                
+                document.getElementById('dong-section').style.display = 'none';
+                renderOrderCards(filtered);
+            };
+            aptContainer.appendChild(allAptBtn);
 
             apartments.forEach(apt => {
                 const btn = document.createElement('button');
@@ -909,7 +1042,7 @@
                 btn.innerText = `${apt} (${aptGroups[apt].length})`;
                 btn.onclick = () => {
                     activeApartment = apt;
-                    activeDong = ""; // 아파트 변경 시 동 초기화
+                    activeDong = "전체"; // 아파트 변경 시 동을 "전체"로 설정
                     document.querySelectorAll('.apt-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     renderDongButtons(aptGroups[apt]);
@@ -917,7 +1050,17 @@
                 aptContainer.appendChild(btn);
             });
 
-            renderDongButtons(aptGroups[activeApartment]);
+            if (activeApartment === "전체") {
+                document.getElementById('dong-section').style.display = 'none';
+                renderOrderCards(filtered);
+            } else if (aptGroups[activeApartment]) {
+                renderDongButtons(aptGroups[activeApartment]);
+            } else {
+                activeApartment = "전체";
+                allAptBtn.classList.add('active');
+                document.getElementById('dong-section').style.display = 'none';
+                renderOrderCards(filtered);
+            }
         }
 
         // 동 버튼 생성
@@ -940,15 +1083,27 @@
 
             if (dongs.length === 0) {
                 document.getElementById('dong-section').style.display = 'none';
-                document.getElementById('order-list').innerHTML = '<div style="text-align:center; padding:50px; font-weight:800; color:var(--text-sub);">동 정보 파싱에 실패한 주문만 있거나 배달이 없습니다.</div>';
+                document.getElementById('order-list').innerHTML = '<div style="text-align:center; padding:50px; font-weight:800; color:var(--text-sub); font-size: 14px;">동 정보 파싱에 실패한 주문만 있거나 배달이 없습니다.</div>';
                 return;
             }
 
             document.getElementById('dong-section').style.display = 'block';
 
-            if (!activeDong || !dongs.includes(activeDong)) {
-                activeDong = dongs[0];
+            if (!activeDong) {
+                activeDong = "전체";
             }
+
+            // "전체" 버튼 생성
+            const allBtn = document.createElement('button');
+            allBtn.className = `btn-select dong-btn ${activeDong === '전체' ? 'active' : ''}`;
+            allBtn.innerText = `전체 (${aptOrders.length})`;
+            allBtn.onclick = () => {
+                activeDong = "전체";
+                document.querySelectorAll('.dong-btn').forEach(b => b.classList.remove('active'));
+                allBtn.classList.add('active');
+                renderOrderCards(aptOrders);
+            };
+            dongContainer.appendChild(allBtn);
 
             dongs.forEach(dong => {
                 const btn = document.createElement('button');
@@ -963,7 +1118,16 @@
                 dongContainer.appendChild(btn);
             });
 
-            renderOrderCards(dongGroups[activeDong]);
+            // 초기 렌더링 호출
+            if (activeDong === "전체") {
+                renderOrderCards(aptOrders);
+            } else if (dongGroups[activeDong]) {
+                renderOrderCards(dongGroups[activeDong]);
+            } else {
+                activeDong = "전체";
+                allBtn.classList.add('active');
+                renderOrderCards(aptOrders);
+            }
         }
 
         // 주문 리스트 카드 렌더링
@@ -971,7 +1135,7 @@
             const listContainer = document.getElementById('order-list');
             listContainer.innerHTML = '';
 
-            // 동별 그룹화된 주문들의 호수 오름차순 정렬
+            // 동별 그룹화된 주문들의 호수 오름차순 정렬을 위한 헬퍼
             const extractHoNum = (item) => {
                 const detail = item.addressDetail || "";
                 const match = detail.match(/([0-9]+)\s*호/);
@@ -981,62 +1145,160 @@
                 return 9999;
             };
 
-            dongOrders.sort((a, b) => extractHoNum(a) - extractHoNum(b));
+            // 정렬 처리
+            if (activeApartment === "전체") {
+                const customOrder = ["푸르지오", "센트리버", "리버나인", "더샵", "더샾", "칸타빌"];
+                const getAptWeight = (name) => {
+                    if (name === "기타") return 9999;
+                    const idx = customOrder.indexOf(name);
+                    return idx !== -1 ? idx : 1000;
+                };
 
-            // 공동현관 비번 정보 로드
-            const cachedPassword = (entrancePasswords[activeApartment] && entrancePasswords[activeApartment][activeDong]) || "";
+                dongOrders.sort((a, b) => {
+                    const aptA = extractApartmentName(a.address);
+                    const aptB = extractApartmentName(b.address);
+                    
+                    if (aptA !== aptB) {
+                        const wA = getAptWeight(aptA);
+                        const wB = getAptWeight(aptB);
+                        if (wA !== wB) return wA - wB;
+                        return aptA.localeCompare(aptB);
+                    }
+                    
+                    const dongA = getDongNumber(a.addressDetail, a.address);
+                    const dongB = getDongNumber(b.addressDetail, b.address);
+                    if (dongA !== dongB) {
+                        return dongA.localeCompare(dongB, undefined, {numeric: true});
+                    }
+                    
+                    return extractHoNum(a) - extractHoNum(b);
+                });
+            } else {
+                dongOrders.sort((a, b) => extractHoNum(a) - extractHoNum(b));
+            }
 
-            // 첫째줄: 공동현관 비번 입력란 카드 렌더링
-            const pwdCard = document.createElement('div');
-            pwdCard.className = 'password-card';
-            pwdCard.innerHTML = `
-                <div class="password-header">🚪 ${activeApartment} ${activeDong} 공동현관 비번</div>
-                <div class="password-body">
-                    <input type="text" id="entrance-password-input" class="password-input" placeholder="비밀번호(예: 열쇠1234종) 입력..." value="${cachedPassword}">
-                    <button class="btn-pwd-save" onclick="saveEntrancePassword()">저장</button>
-                </div>
-            `;
-            listContainer.appendChild(pwdCard);
-
-            // 주문 카드 목록 생성
+            // 고객별(전화번호 기준) 주문 그룹화
+            const customerGroups = {};
             dongOrders.forEach(item => {
+                const customerKey = String(item.phone || "").replace(/\D/g, "");
+                if (!customerKey) return;
+                
+                if (!customerGroups[customerKey]) {
+                    customerGroups[customerKey] = {
+                        name: item.name,
+                        phone: item.phone,
+                        address: item.address,
+                        addressDetail: item.addressDetail,
+                        entrance: item.entrance || "",
+                        itemsList: [],
+                        orders: [],
+                        status: "배달완료", // 기본 완료로 설정 후 미완료 주문 발견 시 하향 조정
+                        deliveryPhoto: "",
+                        deliveryPhotoTime: null
+                    };
+                }
+                
+                customerGroups[customerKey].orders.push(item);
+                customerGroups[customerKey].itemsList.push({
+                    name: item.item,
+                    qty: item.qty
+                });
+                
+                if (item.entrance && !customerGroups[customerKey].entrance) {
+                    customerGroups[customerKey].entrance = item.entrance;
+                }
+                
+                if (item.deliveryPhoto && !customerGroups[customerKey].deliveryPhoto) {
+                    customerGroups[customerKey].deliveryPhoto = item.deliveryPhoto;
+                    customerGroups[customerKey].deliveryPhotoTime = item.deliveryPhotoTime;
+                }
+            });
+
+            // 고객별 통합 배달 상태 결정
+            const groupedCustomers = Object.values(customerGroups);
+            groupedCustomers.forEach(group => {
+                const statuses = group.orders.map(o => o.status);
+                const allDelivered = statuses.every(s => s === "배달완료");
+                if (allDelivered) {
+                    group.status = "배달완료";
+                } else {
+                    const hasStocked = statuses.some(s => s === "입고" || s === "배달완료");
+                    group.status = hasStocked ? "입고" : "대기";
+                }
+            });
+
+            // 대표 주문 기준 호수로 오름차순 정렬 (dongOrders의 순서대로 정렬)
+            groupedCustomers.sort((a, b) => {
+                return dongOrders.indexOf(a.orders[0]) - dongOrders.indexOf(b.orders[0]);
+            });
+
+            // 공동현관 비번 정보 로드 (동이 "전체"가 아닐 때만 노출)
+            if (activeDong !== "전체" && activeApartment !== "전체") {
+                const cachedPassword = (entrancePasswords[activeApartment] && entrancePasswords[activeApartment][activeDong]) || "";
+
+                // 첫째줄: 공동현관 비번 입력란 카드 렌더링
+                const pwdCard = document.createElement('div');
+                pwdCard.className = 'password-card';
+                pwdCard.innerHTML = `
+                    <div class="password-header">🚪 ${activeApartment} ${activeDong} 공동현관 비번</div>
+                    <div class="password-body">
+                        <input type="text" id="entrance-password-input" class="password-input" placeholder="비밀번호(예: 열쇠1234종) 입력..." value="${cachedPassword}">
+                        <button class="btn-pwd-save" onclick="saveEntrancePassword()">저장</button>
+                    </div>
+                `;
+                listContainer.appendChild(pwdCard);
+            }
+
+            // 통합 주문 카드 목록 생성
+            groupedCustomers.forEach(customer => {
                 const card = document.createElement('div');
-                const isCompleted = item.status === '배달완료';
+                const isCompleted = customer.status === '배달완료';
                 card.className = `rider-card ${isCompleted ? 'completed' : ''}`;
 
-                // 호수 추출
+                // 호수 추출 (첫 대표 주문 기준)
+                const representativeItem = customer.orders[0];
                 let hoLabel = "";
-                const hoNum = extractHoNum(item);
+                const hoNum = extractHoNum(representativeItem);
                 if (hoNum !== 9999) {
                     hoLabel = hoNum + "호";
                 } else {
-                    hoLabel = item.addressDetail || "주소상세";
+                    hoLabel = representativeItem.addressDetail || "주소상세";
                 }
                 
-                // 동 원본 번호
-                const rawDong = getDongNumber(item.addressDetail, item.address);
-                const fullDongHo = rawDong ? `${rawDong}동 ${hoLabel}` : hoLabel;
+                // 동 원본 번호 및 아파트 표시 분기
+                const rawDong = getDongNumber(representativeItem.addressDetail, representativeItem.address);
+                let fullDongHo = "";
+                if (activeApartment === "전체") {
+                    const aptName = extractApartmentName(representativeItem.address);
+                    fullDongHo = `[${aptName}] ${rawDong ? `${rawDong}동 ` : ''}${hoLabel}`;
+                } else {
+                    fullDongHo = rawDong ? `${rawDong}동 ${hoLabel}` : hoLabel;
+                }
 
                 // 전화번호 포맷 정규화
-                const cleanPhone = String(item.phone || "").replace(/\D/g, "");
+                const cleanPhone = String(customer.phone || "").replace(/\D/g, "");
 
-                let itemHtml = `
+                // 주문 상품 묶음 HTML 생성
+                let itemHtml = customer.itemsList.map(it => `
                     <div class="item-row">
-                        <span>${item.item}</span>
-                        <span class="item-qty">${item.qty}개</span>
+                        <span>${it.name}</span>
+                        <span class="item-qty">${it.qty}개</span>
                     </div>
-                `;
+                `).join('');
+
+                // 묶음 주문의 모든 orderKey들을 쉼표로 연결하여 액션 파라미터로 넘김
+                const orderKeysStr = customer.orders.map(o => o.orderKey).join(',');
 
                 card.innerHTML = `
                     <div class="rider-card-header">
                         <span class="unit-number">${fullDongHo}</span>
-                        <span class="customer-name">${item.name} 고객님</span>
+                        <span class="customer-name">${customer.name} 고객님</span>
                     </div>
                     <div class="rider-card-body">
-                        <div class="address-text">${item.address} ${item.addressDetail}</div>
-                        ${item.entrance ? `
+                        <div class="address-text">${representativeItem.address} ${representativeItem.addressDetail}</div>
+                        ${customer.entrance ? `
                             <div class="address-box" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8;">
-                                🚪 공동현관 입력값: <b>${item.entrance}</b>
+                                🚪 공동현관 입력값: <b>${customer.entrance}</b>
                             </div>
                         ` : ''}
                         
@@ -1044,18 +1306,18 @@
                             ${itemHtml}
                         </div>
 
-                        ${item.deliveryPhoto ? `
+                        ${customer.deliveryPhoto ? `
                             <div class="photo-thumbnail-container">
                                 <span style="font-size:11px; font-weight:800; color:var(--primary);">📸 배달 완료 사진:</span>
-                                <img src="${item.deliveryPhoto}" class="photo-thumbnail" onclick="viewDeliveryPhoto('${item.phone}_${item.orderKey}', '${item.deliveryPhoto}')">
+                                <img src="${customer.deliveryPhoto}" class="photo-thumbnail" onclick="viewDeliveryPhoto('${customer.phone}_${customer.orders[0].orderKey}', '${customer.deliveryPhoto}')">
                             </div>
                         ` : ''}
                     </div>
                     <div class="rider-card-footer no-print">
                         <a href="tel:${cleanPhone}" class="btn-action btn-call">📞 전화</a>
                         <a href="sms:${cleanPhone}" class="btn-action btn-sms">💬 문자</a>
-                        <button class="btn-action btn-photo" onclick="triggerCameraUpload('${item.phone}', '${item.orderKey}')">📸 사진업로드</button>
-                        <button class="btn-action btn-complete" onclick="markAsDelivered('${item.phone}', '${item.orderKey}')">🚚 배달완료</button>
+                        <button class="btn-action btn-photo" onclick="triggerCameraUpload('${customer.phone}', '${orderKeysStr}', '${customer.name}')">📸 사진업로드</button>
+                        <button class="btn-action btn-complete" onclick="markAsDelivered('${customer.phone}', '${orderKeysStr}', '${customer.name}')">🚚 배달완료</button>
                     </div>
                 `;
                 listContainer.appendChild(card);
@@ -1092,28 +1354,45 @@
             }
         }
 
-        // 단순 배달 완료 처리
-        async function markAsDelivered(phone, orderKey) {
+        // 단순 배달 완료 처리 (여러 주문 일괄 처리)
+        async function markAsDelivered(phone, orderKeysStr, customerName) {
             if (!confirm("배달 완료 처리하시겠습니까?")) return;
             showLoader("배달 완료 처리 중...");
             const cleanPhone = String(phone).replace(/\D/g, "");
-            const url = `${FIREBASE_DB_URL}orders/${cleanPhone}/${orderKey}.json`;
+            const orderKeys = orderKeysStr.split(",");
             try {
+                const promises = [];
                 const patchBody = {
                     status: "배달완료",
                     canceled: false,
                     isStocked: true,
-                    received: false,
                     delivered: true
                 };
-                const res = await fetch(url, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(patchBody)
-                });
-                if (!res.ok) throw new Error("상태 업데이트 실패");
                 
+                orderKeys.forEach(orderKey => {
+                    const url = `${FIREBASE_DB_URL}orders/${cleanPhone}/${orderKey}.json`;
+                    promises.push(
+                        fetch(url, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(patchBody)
+                        })
+                    );
+                });
+                
+                await Promise.all(promises);
                 showToast("배달 완료 처리되었습니다.");
+                
+                // 완료 메시지 발송 모달/연동 호출
+                const messageText = `[모켓] ${customerName}님, 주문하신 상품의 배달이 완료되었습니다. 감사합니다.🙇🏻‍♂️`;
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                const separator = isIOS ? '&' : '?';
+                const smsUrl = `sms:${cleanPhone}${separator}body=${encodeURIComponent(messageText)}`;
+                
+                setTimeout(() => {
+                    window.location.href = smsUrl;
+                }, 800);
+
                 await loadData();
             } catch (e) {
                 console.error(e);
@@ -1123,43 +1402,64 @@
             }
         }
 
-        // 카메라 사진 업로드 준비
-        function triggerCameraUpload(phone, orderKey) {
+        // 준비 사진 업로드 준비
+        let activeUploadKeys = [];
+        let activeUploadCustomerName = "";
+        function triggerCameraUpload(phone, orderKeysStr, customerName) {
             activeUploadPhone = phone;
-            activeUploadKey = orderKey;
+            activeUploadKeys = orderKeysStr.split(",");
+            activeUploadCustomerName = customerName;
             document.getElementById('camera-input').click();
         }
 
-        // 배달 완료 사진 업로드 처리
+        // 배달 완료 사진 업로드 처리 (여러 주문 일괄 처리)
         async function handleDeliveryPhotoUpload(event) {
             const file = event.target.files[0];
-            if (!file || !activeUploadPhone || !activeUploadKey) return;
+            if (!file || !activeUploadPhone || !activeUploadKeys || activeUploadKeys.length === 0) return;
             showLoader("사진 압축 및 업로드 중...");
             try {
                 const compressedBase64 = await resizeAndCompressImage(file);
                 const cleanPhone = String(activeUploadPhone).replace(/\D/g, "");
-                const url = `${FIREBASE_DB_URL}orders/${cleanPhone}/${activeUploadKey}.json`;
                 
                 const patchBody = {
                     status: "배달완료",
                     canceled: false,
                     isStocked: true,
-                    received: false,
                     delivered: true,
                     deliveryPhoto: compressedBase64,
                     deliveryPhotoTime: Date.now()
                 };
 
-                const res = await fetch(url, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(patchBody)
+                const promises = [];
+                activeUploadKeys.forEach(orderKey => {
+                    const url = `${FIREBASE_DB_URL}orders/${cleanPhone}/${orderKey}.json`;
+                    promises.push(
+                        fetch(url, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(patchBody)
+                        })
+                    );
                 });
-                if (!res.ok) throw new Error("사진 업로드 실패");
 
+                await Promise.all(promises);
                 showToast("배달 사진이 업로드되었으며, 배달 완료 처리되었습니다.");
+                
+                // 완료 메시지 발송 모달/연동 호출
+                const customerName = activeUploadCustomerName || "고객";
+                const messageText = `[모켓] ${customerName}님, 주문하신 상품의 배달이 완료되었습니다. 감사합니다.🙇🏻‍♂️`;
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                const separator = isIOS ? '&' : '?';
+                const smsUrl = `sms:${cleanPhone}${separator}body=${encodeURIComponent(messageText)}`;
+                
                 activeUploadPhone = "";
-                activeUploadKey = "";
+                activeUploadKeys = [];
+                activeUploadCustomerName = "";
+                
+                setTimeout(() => {
+                    window.location.href = smsUrl;
+                }, 800);
+
                 await loadData();
             } catch (e) {
                 console.error(e);
@@ -1200,11 +1500,13 @@
             }
         }
 
-        // 유틸 UI 효과
+        // UI 효과
         function showLoader(text = "처리 중입니다...") {
             document.getElementById('loader-text').innerText = text;
             document.getElementById('loader').style.display = 'flex';
         }
+
+        function borderText() {}
 
         function hideLoader() {
             document.getElementById('loader').style.display = 'none';
